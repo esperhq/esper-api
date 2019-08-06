@@ -1,0 +1,91 @@
+{
+    //olaat payload
+    payload:[		//position in this array is meaningless, the flashPosition gives the order
+        {
+            id:1,						1<=id<=255		//unique
+            flashPosition:2,  			1<=id<=255
+            intensity:[0.99,0.5,0], 	0<=int<=1
+            duration:1.99				0 < duration <= 30 //ms
+        },
+        {
+            id:2,						1<=id<=255		//unique
+            flashPosition:1,  			1<=id<=255
+            intensity:[0.99,0.5,0], 	0<=int<=1
+            duration:1.99				0 < duration <= 30 //ms
+        },
+        {
+            id:4,						1<=id<=255		//unique
+            flashPosition:3,  			1<=id<=255
+            intensity:[3,0,0], 			0<=int<=1
+            duration:5					0 < duration <= 30 //ms
+        },
+        //...
+        //anything not listed here wont flash
+
+    ],
+
+}
+
+
+
+{
+    //sequencer payload
+    payload:[	//the position in this array is important - it gives the order of the light stages
+        {	//stage one
+            duration:1.99,
+            lights:[		//referring to light nodes as lights...
+                {id:1,intensity:[0,0,0.7500]},
+                {id:2,intensity:[1,0,0]},
+                //inferred that id3 =[0,0,0]
+                {id:4,intensity:[0,1,0]},
+
+            ]
+        },
+        {
+            duration:1.99,
+            lights:[
+                {id:1,leds:[0,0,0.7500]},
+                {id:2,leds:[1,0,0]},
+                {id:4,leds:[0,1,0]},
+
+            ]
+        },
+    ],
+
+}
+
+
+{
+    method:'trigger',
+        start:3,		//zero indexed
+        count:2,        //number of frames to capture
+        acclimatisationDuration: 3000,      // 0 if not wanted
+        acclimatisationIntensity: 0.0300,
+        preFocusDelay:300,
+}
+
+
+{
+    method:'get-available-lights',
+        returns =>
+            [
+                {   id:1,
+                    xyz:[0,0,0],
+                    ledPolarisation:['horisonal','neutral','vertical'],
+                    maxFlashDuration:50,
+                    maxModellingLight:0.03,
+                    maxLightStages:32
+                },
+                ...for every light
+]
+}
+
+{
+    modellingLight:
+        [
+            {id:1,intensities:[0.03,0.01944999,0.02]},
+            {id:2,intensities:[0.03,0.01944999,0.02]},
+            {id:6,intensities:[0.03,0.01944999,0.02]}
+            //any lights not in the array are assumed to be dark
+        ],
+}
