@@ -4,19 +4,19 @@
         {
             id:1,						1<=id<=255		//unique
             flashPosition:2,  			1<=id<=255
-            intensity:[0.99,0.5,0], 	0<=int<=1
+            intensities:[0.99,0.5,0], 	0<=int<=1
             duration:1.99				0 < duration <= 30 //ms
         },
         {
             id:2,						1<=id<=255		//unique
             flashPosition:1,  			1<=id<=255
-            intensity:[0.99,0.5,0], 	0<=int<=1
+            intensities:[0.99,0.5,0], 	0<=int<=1
             duration:1.99				0 < duration <= 30 //ms
         },
         {
             id:4,						1<=id<=255		//unique
             flashPosition:3,  			1<=id<=255
-            intensity:[3,0,0], 			0<=int<=1
+            intensities:[3,0,0], 			0<=int<=1
             duration:5					0 < duration <= 30 //ms
         },
         //...

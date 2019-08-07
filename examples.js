@@ -2,7 +2,7 @@ const esper = require('./Esper');
 let theHelpers = require('./test/testhelpers');
 let helper = new theHelpers(false);
 
-const Esper = new esper('http://localhost:50005',true);
+const Esper = new esper(true,'http://192.168.1.14');
 
 helper.start().then(()=>{
     Esper.connect()
@@ -13,7 +13,7 @@ helper.start().then(()=>{
                     console.log("Modelling lights set");
                 })
                 .catch((error)=>{
-                    console.log(error);
+                    Esper.describeErrors(error);
                 });
             Esper.modellingLightOff();
         });
