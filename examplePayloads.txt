@@ -31,25 +31,19 @@
 {
     //sequencer payload
     payload:[	//the position in this array is important - it gives the order of the light stages
-        {	//stage one
-            duration:1.99,
-            lights:[		//referring to light nodes as lights...
-                {id:1,intensity:[0,0,0.7500]},
-                {id:2,intensity:[1,0,0]},
-                //inferred that id3 =[0,0,0]
-                {id:4,intensity:[0,1,0]},
+        [
+            {id:1,intensities:[0,0,0.7500],duration:1.99},
+            {id:2,intensities:[1,0,0],duration:1.99},
+            //inferred that id3 =[0,0,0]
+            {id:4,intensities:[0,1,0],duration:1.99},
+        ],
+        [
+            {id:1,intensities:[0,0,0.7500],duration:1.99},
+            {id:2,intensities:[1,0,0],duration:1.99},
+            //inferred that id3 =[0,0,0]
+            {id:4,intensities:[0,1,0],duration:1.99},
+        ],
 
-            ]
-        },
-        {
-            duration:1.99,
-            lights:[
-                {id:1,leds:[0,0,0.7500]},
-                {id:2,leds:[1,0,0]},
-                {id:4,leds:[0,1,0]},
-
-            ]
-        },
     ],
 
 }
