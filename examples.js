@@ -19,5 +19,3 @@ Esper.sandbox()
     }).catch((err)=>{
         Esper.describeErrors(err);
 });
-
-

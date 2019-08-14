@@ -414,9 +414,127 @@ module.exports = class {
     /*
     *   The command to tell the rig to start the capture. Fine-grained control over number of stages to take
     * */
-    trigger(args = ''){
+    trigger(args){
         return new Promise((resolve,reject)=>{
-            reject(['sopmefhgd']);
+            let errorMessages = [];
+            let allOk = True;
+            let triggerPayload = {};
+
+
+            if(args.hasOwnProperty('stages')){
+                if(typeof (args.stages) === 'number' && !(args.stages%1)){
+                    if( args.stages <= 32 && args.stages >=0){
+                        triggerPayload.stages = args.stages;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('stages must be between 0 and 32 - '+args.stages+' given');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('stages must be an integer');
+                }
+            }else{
+                triggerPayload.stages = 0;
+            }
+
+            if(args.hasOwnProperty('start')){
+                if(typeof (args.start) === 'number' && !(args.start%1)){
+                    if( args.start <= 32 && args.start >=0){
+                        triggerPayload.start = args.start;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('start must be between 0 and 32 - '+args.start+' given');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('start must be an integer');
+                }
+            }else{
+                triggerPayload.start = 0;
+            }
+
+
+            if(args.hasOwnProperty('acclimatizationDuration')){
+                if(typeof (args.acclimatizationDuration) === 'number' && !(args.acclimatizationDuration%1)){
+                    if( args.acclimatizationDuration <= 10000 && args.acclimatizationDuration >=0){
+                        triggerPayload.acclimatizationDuration = args.acclimatizationDuration;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('Acclimatization duration must be between 0 and 10000 - '+args.acclimatizationDuration+' given');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('Acclimatization duration must be an integer');
+                }
+            }else{
+                triggerPayload.acclimatizationDuration = 0;
+            }
+
+
+            if(args.hasOwnProperty('acclimatizationIntensity')){
+                if(typeof (args.acclimatizationIntensity) === 'number'){
+                    if( args.acclimatizationIntensity <= 10 && args.acclimatizationIntensity >=0){
+                        triggerPayload.acclimatizationIntensity = args.acclimatizationIntensity;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('Acclimatization intensity must be between 0 and 10 - '+args.acclimatizationIntensity+' given');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('Acclimatization intensity must be a number');
+                }
+            }else{
+                triggerPayload.acclimatizationIntensity = 0;
+            }
+
+
+
+            if(args.hasOwnProperty('preFocusDelay')){
+                if(typeof (args.preFocusDelay) === 'number' && !(args.preFocusDelay%1)){
+                    if( args.preFocusDelay <= 1000 && args.preFocusDelay >=0){
+                        triggerPayload.preFocusDelay = args.preFocusDelay;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('Pre-focus delay must be between 0 and 10 - '+args.preFocusDelay+' given');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('Pre-focus delay must be an integer');
+                }
+            }else{
+                triggerPayload.preFocusDelay = 0;
+            }
+
+
+            if(args.hasOwnProperty('captureMode')){
+                if(typeof (args.captureMode) === 'string'){
+                    let acceptable = ['dslr', 'mv', 'video'];
+                    if(acceptable.includes(args.captureMode)){
+                        triggerPayload.captureMode = args.captureMode;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('Capture mode must be either "dslr", "mv" or "video" - "'+args.captureMode+'" given');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('Capture mode must be a string');
+                }
+            }else{
+                triggerPayload.captureMode = 'dslr';
+            }
+
+
+            if(allOk){
+                this.socket.emit('api-trigger',triggerPayload,(response)=>{
+                    if (response.status) {
+                        resolve();
+                    } else {
+                        reject(response.errors);
+                    }
+                });
+            }else{
+                reject(errorMessages);
+            }
         });
     }
 
@@ -470,7 +588,6 @@ module.exports = class {
 
     sandbox(){
         return new Promise((resolve,reject)=>{
-            reject(['This is an example error message','This is a second error that arose']);
             if(this.verbose){console.log("starting server");}
             this.server = require('socket.io').listen(this.port);
             this.server.on('connection',(socket)=>{
