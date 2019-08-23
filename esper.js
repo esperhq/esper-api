@@ -77,18 +77,18 @@ module.exports = class {
     /*
     *   Turns on the modelling light - steady state lighting for each light node
     * */
-    modellingLight(payload){
+    globalModellingLight(payload){
         return new Promise((resolve,reject)=> {
             if (this.connected) {
                 let allOk = true;
                 let desiredGlobalModellingLight = [];
                 let errorMessages = [];
-                if (typeof (payload[0]) === 'number') {
+               // if (typeof (payload[0]) === 'number') {
                     if (payload.length !== 3) {
                         allOk = false;
                         errorMessages.push('Expected an intensity array of length 3');
                     }
-                    if (typeof (payload[0]) === 'number' && typeof (payload[1]) === 'number' && typeof (payload[2]) === 'number') {
+                    if (typeof payload[0] !== 'number' || typeof payload[1] !== 'number' || typeof payload[2] !== 'number') {
                         allOk = false;
                         errorMessages.push('Light intensities should be a number');
                     } else {
@@ -121,7 +121,7 @@ module.exports = class {
                     } else {
                         reject(errorMessages)
                     }
-                } else {
+                /*} else {
                     //check if we want specific modelling lights
                     for (let i = 0; i < payload.length; i++) {
                         if (payload[i].intensities.length !== 3) {
@@ -188,7 +188,7 @@ module.exports = class {
                     } else {
                         reject(errorMessages);
                     }
-                }
+                }*/
             }
         });
     }
@@ -265,26 +265,31 @@ module.exports = class {
                 chainData[i].intensities[2] = (Math.round(parseFloat(chainData[i].intensities[2])*10000)/10000);
                 if(chainData[i].intensities[0] < 0 || chainData[i].intensities[0] > 100 ){
                     allOk = false;
-                    errorMessages.push(`Flash intensities must between 0 and 100 - sent ${chainData[i].intensities[0]} - occurred on stage ${i+1} light node ID ${chainData[i].id}`);
+                    errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[0]} passed`);
                 }
                 if(chainData[i].intensities[1] < 0 || chainData[i].intensities[1] > 100 ){
                     allOk = false;
-                    errorMessages.push(`Flash intensities must between 0 and 100 - sent ${chainData[i].intensities[1]} - occurred on stage ${i+1} light node ID ${chainData[i].id}`);
+                    errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[1]} passed`);
                 }
                 if(chainData[i].intensities[2] < 0 || chainData[i].intensities[2] > 100 ){
                     allOk = false;
-                    errorMessages.push(`Flash intensities must between 0 and 100 - sent ${chainData[i].intensities[2]} - occurred on stage ${i+1} light node ID ${chainData[i].id}`);
+                    errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[2]} passed`);
                 }
                 //check the flash positions are within range
-                if(chainData[i].flashPosition > 255){
+                if(chainData[i].flashPosition > 255 || chainData[i].flashPosition < 0 ){
                     allOk = false;
-                    errorMessages.push(`Highest flash position was in excess of the maximum of 255 - occurred on stage ${i+1} light node ID ${chainData[i].id}`);
+                    errorMessages.push(`Flash position must be between 0 and  255 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].flashPosition} passed`);
                 }
 
-                //check the flash durations are acceptable
-                if(chainData[i].duration > 0 && chainData[i].duration <= 30 ){
+                // check flash duration is a number
+                if(typeof chainData[i].duration !== 'number'){
                     allOk = false;
-                    errorMessages.push(`Duration error - flash duration must be 0 < flash duration <= 30 - occurred on stage ${i+1} light node ID ${chainData[i].id}`)
+                    errorMessages.push(`Flash duration must be a number - occurred on stage ${i+1} light node ID # ${chainData[i].id}`);
+                }
+                //check the flash durations are acceptable
+                if(chainData[i].duration < 0 || chainData[i].duration > 30 ){
+                    allOk = false;
+                    errorMessages.push(`Duration error - flash duration must be between 0 and 30 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].duration} passed`)
                 }
             }
             if(allOk){
@@ -479,7 +484,8 @@ module.exports = class {
                         allOk = false;
                         errorMessages.push('Acclimatization intensity must be between 0 and 10 - '+args.acclimatizationIntensity+' given');
                     }
-                }else{
+                }else{        self.queue = queue.Queue()
+
                     allOk = false;
                     errorMessages.push('Acclimatization intensity must be a number');
                 }
@@ -647,8 +653,6 @@ module.exports = class {
                 });
             });
 
-            //let Server = require('http').Server();
-             //= Server.listen('50005');
             this.connect().then(()=>{resolve()});
         });
     }

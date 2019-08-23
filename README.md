@@ -114,7 +114,7 @@ This will print
     {   
         id:1,
         xyz:[0,0,0],
-        ledPolarisation:['horisonal','neutral','vertical'],
+        ledPolarisation:['horizontal','neutral','vertical'],
         line:0,
         address:1,
         maxFlashDuration:50,
@@ -124,7 +124,7 @@ This will print
     {   
         id:2,
         xyz:[200,0,0],
-        ledPolarisation:['horisonal','neutral','vertical'],
+        ledPolarisation:['horizontal','neutral','vertical'],
         line:0,
         address:2,
         maxFlashDuration:50,
@@ -158,11 +158,11 @@ Each light node object has the following attributes;
 The modelling light can be set in two different manners: Globally or Individually
 
 #### Global Modelling Light
-To set the modelling light globally (each light illuminated the same), choose what brightnesses you want for each LED, then pass this as an array to `Esper.modellingLight()`
+To set the modelling light globally (each light illuminated the same), choose what brightnesses you want for each LED, then pass this as an array to `Esper.globalModellingLight()`
 For example 
 ```javascript
 let globalModellingLightPayload = [1, 3, 0.5]; 
-Esper.modellingLight(globalModellingLightPayload);
+Esper.globalModellingLight(globalModellingLightPayload);
 ``` 
 would result in 1% brightness for the Horizontally polarised LED, 3% brightness for the Neutral LED and 0.5% brightness for the vertically polarised LED. The array indexes are the same as the `ledPolarisation` attribute on the light node object.
  
