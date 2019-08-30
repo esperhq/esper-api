@@ -17,7 +17,7 @@ npm install esper-api
 
 #
 # Requirements
-By default, the wrapper uses port 50005 to communicate with the API. It is necessary to allow this port in your firewall settings.
+By default, the wrapper uses `port 50005` to communicate with the API. It is necessary to allow this port in your firewall settings.
 In order to connect to the API in production mode, it is necessary to run the Esper Control Suite whenever you are interacting with the API
 
 This wrapper makes use of promises which are only available in Javascript ES6 (ECMA2015) onwards (Node v10+)

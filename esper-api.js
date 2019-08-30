@@ -187,7 +187,7 @@ module.exports = class {
     * */
     modellingLightOff(){
         return new Promise((resolve,reject)=>{
-            this.modellingLight([0,0,0]).then(()=>{resolve();}).catch((err)=>{reject(err)});
+            this.globalModellingLight([0,0,0]).then(()=>{resolve();}).catch((err)=>{reject(err)});
         });
     }
 
@@ -409,12 +409,11 @@ module.exports = class {
     /*
     *   The command to tell the rig to start the capture. Fine-grained control over number of stages to take
     * */
-    trigger(args){
+    trigger(args = {}){
         return new Promise((resolve,reject)=>{
             let errorMessages = [];
-            let allOk = True;
+            let allOk = true;
             let triggerPayload = {};
-
 
             if(args.hasOwnProperty('stages')){
                 if(typeof (args.stages) === 'number' && !(args.stages%1)){
@@ -474,7 +473,7 @@ module.exports = class {
                         allOk = false;
                         errorMessages.push('Acclimatization intensity must be between 0 and 10 - '+args.acclimatizationIntensity+' given');
                     }
-                }else{        self.queue = queue.Queue()
+                }else{
 
                     allOk = false;
                     errorMessages.push('Acclimatization intensity must be a number');

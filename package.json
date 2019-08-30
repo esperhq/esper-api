@@ -2,7 +2,7 @@
   "name": "esper-api",
   "version": "1.0.0",
   "description": "API Wrapper for Esper Control Suite API",
-  "main": "esper.js",
+  "main": "esper-api.js",
   "scripts": {
     "test": "mocha ./test"
   },
