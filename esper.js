@@ -1,6 +1,5 @@
 const io = require('socket.io-client');
 
-
 module.exports = class {
 
     constructor(verbose = true, endpoint = 'http://localhost', port = 50005){
@@ -658,6 +657,4 @@ module.exports = class {
             resolve();
         });
     }
-
-
 };

@@ -8,7 +8,8 @@ This wrapper also includes a sandbox for you to test your scripts. You won't nee
 
 #
 # Installation
-This package is available through NPM, install it in your project with the command
+~~This package is available through NPM, install it in your project with the command~~
+* Currently pre-release - will be available on NPM shortly
 ```bash
 npm install esper-api
 ```
@@ -242,7 +243,7 @@ let chainPayload = [
     },
     {
         id:4,
-        stage:3,
+        stage:3,https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-datahttps://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data
         intensities:[100,100,100],
         duration:10,
     },
@@ -269,7 +270,7 @@ Each light stage has the following attributes:
 ```javascript
 [
     {id:1,intensities:[0,0,75.00],duration:5.5},
-    {id:2,intensities:[100,0,0],duration:5},
+    {id:2,intensities:[100,0,0]https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data,duration:5},
     {id:3,intensities:[100,0,0],duration:5},
     {id:4,intensities:[0,100,0],duration:3},
     //...
@@ -340,4 +341,73 @@ Esper.trigger( triggerArgs )
     .catch((errs)=>{
         Esper.describeErrors(errs);
     });
+```
+# Examples
+
+Let's create a worked example of a mini rig with 6 lights. We will connect to the Esper API, upload a lighting profile to the rig, turn the modelling light on for 10 seconds, then turn it off before triggering the cameras.
+Order of operation:
+1. Connect to Esper API
+2. Upload a sequence payload consisting of 3 stages
+3. Turn on the modelling light
+4. Wait 10 seconds
+5. Turn the modelling light off
+6. Perform a full capture
+
+```javascript
+const esperClass = require('esper-api');
+const Esper = new esperClass();
+
+//define our very simple lighting profile
+let payload = [
+    // stage 1
+    [
+        {id:1,intensities:[0,100,0],duration:5},
+        {id:2,intensities:[0,100,0],duration:5},
+        {id:3,intensities:[0,100,0],duration:5},
+        {id:4,intensities:[0,100,0],duration:5},
+        {id:5,intensities:[0,100,0],duration:5},
+        {id:6,intensities:[0,100,0],duration:5}
+    ],
+    // stage 2
+    [
+        {id:1,intensities:[0,0,100],duration:5},
+        {id:2,intensities:[0,0,100],duration:5},
+        {id:3,intensities:[0,0,100],duration:5},
+        {id:4,intensities:[0,0,100],duration:5},
+        {id:5,intensities:[0,0,100],duration:5},
+        {id:6,intensities:[0,0,100],duration:5}
+    ],
+    // stage 3 - final
+    [
+        {id:1,intensities:[100,0,0],duration:5},
+        {id:2,intensities:[100,0,0],duration:5},
+        {id:3,intensities:[100,0,0],duration:5},
+        {id:4,intensities:[100,0,0],duration:5},
+        {id:5,intensities:[100,0,0],duration:5},
+        {id:6,intensities:[100,0,0],duration:5}
+    ]
+];
+
+// Deal with the API
+Esper.connect()
+    .then(()=>{
+        return Esper.sequence(payload);
+    })
+    .then(()=>{
+        return Esper.globalModellingLight([0,1.5,0]);
+    })
+    .then(()=>{
+        return new Promise((resolve)=>{
+            setTimeout(()=>{
+                Esper.modellingLightOff()
+                    .then(resolve);
+            },10000);
+        });
+    })
+    .then(()=>{
+        return Esper.trigger(); //simple trigger with no args
+    })
+    .catch((errors)=>{
+        Esper.describeErrors(errors);
+    })
 ```
