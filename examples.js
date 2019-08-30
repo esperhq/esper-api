@@ -19,7 +19,7 @@ let sequenceData =[
     ],
 ];
 
-Esper.sandbox()
+Esper.connect()
     .then(()=> {
         return Esper.sequence(sequenceData);
     })
@@ -29,6 +29,7 @@ Esper.sandbox()
         return Esper.disconnect();
     })
     .catch((err)=>{
+        console.log(err);
         Esper.describeErrors(err);
     });
 

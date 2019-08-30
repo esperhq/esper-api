@@ -56,7 +56,7 @@ module.exports = class {
                         this.availableLights = payload.lights;
                         resolve(payload.lights);
                     }else{
-                        reject(response.errors);
+                        reject(payload.errors);
                     }
                 });
             }else{
