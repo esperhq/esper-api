@@ -83,112 +83,102 @@ module.exports = class {
                 let allOk = true;
                 let desiredGlobalModellingLight = [];
                 let errorMessages = [];
-               // if (typeof (payload[0]) === 'number') {
-                    if (payload.length !== 3) {
+                if (payload.length !== 3) {
+                    allOk = false;
+                    errorMessages.push('Expected an intensity array of length 3');
+                }
+                if (typeof payload[0] !== 'number' || typeof payload[1] !== 'number' || typeof payload[2] !== 'number') {
+                    allOk = false;
+                    errorMessages.push('Light intensities should be a number');
+                } else {
+                    desiredGlobalModellingLight = [
+                        (Math.round(parseFloat(payload[0]) * 10000) / 10000),
+                        (Math.round(parseFloat(payload[1]) * 10000) / 10000),
+                        (Math.round(parseFloat(payload[2]) * 10000) / 10000),
+                    ];
+                    if (desiredGlobalModellingLight[0] < 0 || desiredGlobalModellingLight[0] > 3) {
                         allOk = false;
-                        errorMessages.push('Expected an intensity array of length 3');
+                        errorMessages.push('Intensity should be between 0 and 3%');
                     }
-                    if (typeof payload[0] !== 'number' || typeof payload[1] !== 'number' || typeof payload[2] !== 'number') {
+                    if (desiredGlobalModellingLight[1] < 0 || desiredGlobalModellingLight[1] > 3) {
                         allOk = false;
-                        errorMessages.push('Light intensities should be a number');
+                        errorMessages.push('Intensity should be between 0 and 3%');
+                    }
+                    if (desiredGlobalModellingLight[2] < 0 || desiredGlobalModellingLight[2] > 3) {
+                        allOk = false;
+                        errorMessages.push('Intensity should be between 0 and 3%');
+                    }
+                }
+                if (allOk) {
+                    this.socket.emit('api-set-global-modelling-light', desiredGlobalModellingLight, (response) => {
+                        if (response.status) {
+                            resolve(desiredGlobalModellingLight);
+                        } else {
+                            reject(response.errors);
+                        }
+                    });
+                } else {
+                    reject(errorMessages)
+                }
+            }
+        });
+    }
+
+    individualModellingLight(payload) {
+        return new Promise((resolve,reject)=>{
+
+            let allOk = true;
+            let errorMessages = [];
+
+            if (payload.intensities.length !== 3) {
+                allOk = false;
+                errorMessages.push(`Expecting intensities to be an array of length 3`)
+            }
+
+            if (typeof (payload.intensities[0]) !== 'number') {
+                allOk = false;
+                errorMessages.push(`Light intensities should be a number`);
+            }
+            if (typeof (payload.intensities[1]) !== 'number') {
+                allOk = false;
+                errorMessages.push(`Light intensities should be a number`);
+            }
+            if (typeof (payload.intensities[2]) !== 'number') {
+                allOk = false;
+                errorMessages.push(`Light intensities should be a number`);
+            }
+
+            payload.intensities[0] = (Math.round(parseFloat(payload.intensities[0]) * 10000) / 10000);
+            payload.intensities[1] = (Math.round(parseFloat(payload.intensities[1]) * 10000) / 10000);
+            payload.intensities[2] = (Math.round(parseFloat(payload.intensities[2]) * 10000) / 10000);
+            if (payload.intensities[0] < 0 || payload.intensities[0] > 3) {
+                allOk = false;
+                errorMessages.push(`Could not set individual modelling light -  intensity should be between 0 and 3%`);
+            }
+            if (payload.intensities[1] < 0 || payload.intensities[1] > 3) {
+                allOk = false;
+                errorMessages.push(`Could not set individual modelling light -  intensity should be between 0 and 3%`);
+            }
+            if (payload.intensities[2] < 0 || payload.intensities[2] > 3) {
+                allOk = false;
+                errorMessages.push(`Could not set individual modelling light -  intensity should be between 0 and 3%`);
+            }
+
+            if (!this.nodeExists(payload.id)) {
+                allOk = false;
+                errorMessages.push(`ID passed does not exist - id ${payload.id}`)
+            }
+
+            if (allOk) {
+                this.socket.emit('api-set-individual-modelling-light', payload, (response) => {
+                    if (response.status) {
+                        resolve();
                     } else {
-                        desiredGlobalModellingLight = [
-                            (Math.round(parseFloat(payload[0]) * 10000) / 10000),
-                            (Math.round(parseFloat(payload[1]) * 10000) / 10000),
-                            (Math.round(parseFloat(payload[2]) * 10000) / 10000),
-                        ];
-                        if (desiredGlobalModellingLight[0] < 0 || desiredGlobalModellingLight[0] > 3) {
-                            allOk = false;
-                            errorMessages.push('Intensity should be between 0 and 3%');
-                        }
-                        if (desiredGlobalModellingLight[1] < 0 || desiredGlobalModellingLight[1] > 3) {
-                            allOk = false;
-                            errorMessages.push('Intensity should be between 0 and 3%');
-                        }
-                        if (desiredGlobalModellingLight[2] < 0 || desiredGlobalModellingLight[2] > 3) {
-                            allOk = false;
-                            errorMessages.push('Intensity should be between 0 and 3%');
-                        }
+                        reject(response.errors);
                     }
-                    if (allOk) {
-                        this.socket.emit('api-set-global-modelling-light', desiredGlobalModellingLight, (response) => {
-                            if (response.status) {
-                                resolve(desiredGlobalModellingLight);
-                            } else {
-                                reject(response.errors);
-                            }
-                        });
-                    } else {
-                        reject(errorMessages)
-                    }
-                /*} else {
-                    //check if we want specific modelling lights
-                    for (let i = 0; i < payload.length; i++) {
-                        if (payload[i].intensities.length !== 3) {
-                            allOk = false;
-                            errorMessages.push(`Expecting intensities to be arrays of length 3 - occurred at stage ${i + 1}`)
-                        }
-
-                        if (typeof (payload[i].intensities[0]) !== 'number') {
-                            allOk = false;
-                            errorMessages.push(`Light intensities should be a number - occurred at stage ${i + 1}`);
-                        }
-                        if (typeof (payload[i].intensities[1]) !== 'number') {
-                            allOk = false;
-                            errorMessages.push(`Light intensities should be a number - occurred at stage ${i + 1}`);
-                        }
-                        if (typeof (payload[i].intensities[2]) !== 'number') {
-                            allOk = false;
-                            errorMessages.push(`Light intensities should be a number - occurred at stage ${i + 1}`);
-                        }
-
-                        payload[i].intensities[0] = (Math.round(parseFloat(payload[i].intensities[0]) * 10000) / 10000);
-                        payload[i].intensities[1] = (Math.round(parseFloat(payload[i].intensities[1]) * 10000) / 10000);
-                        payload[i].intensities[2] = (Math.round(parseFloat(payload[i].intensities[2]) * 10000) / 10000);
-                        if (payload[i].intensities[0] < 0 || payload[i].intensities[0] > 3) {
-                            allOk = false;
-                            errorMessages.push(`Could not set individual modelling lights -  intensity should be between 0 and 3% - occurred at stage ${i + 1}`);
-                        }
-                        if (payload[i].intensities[1] < 0 || payload[i].intensities[1] > 3) {
-                            allOk = false;
-                            errorMessages.push(`Could not set individual modelling lights -  intensity should be between 0 and 3% - occurred at stage ${i + 1}`);
-                        }
-                        if (payload[i].intensities[2] < 0 || payload[i].intensities[2] > 3) {
-                            allOk = false;
-                            errorMessages.push(`Could not set individual modelling lights -  intensity should be between 0 and 3% - occurred at stage ${i + 1}`);
-                        }
-
-                        if (payload.length > this.availableLights.length) {
-                            allOk = false;
-                            errorMessages.push(`Could not set individual modelling lights -  too many light arrays were passed - occurred at stage ${i + 1}`);
-                        }
-
-                        let idStore = [];
-
-                        if (idStore.includes(payload[i].id)) {
-                            allOk = false;
-                            errorMessages.push(`Duplicate Light IDs were passed - id ${payload[i].id} was repeated on stage ${i + 1}`)
-                        }
-                        idStore.push(payload[i].id);
-
-                        if (!this.nodeExists(payload[i].id)) {
-                            allOk = false;
-                            errorMessages.push(`An IDs was passed that does not exist - id ${payload[i].id} was set on stage ${i + 1}`)
-                        }
-
-                    }
-                    if (allOk) {
-                        this.socket.emit('api-set-individual-modelling-light', payload, (response) => {
-                            if (response.status) {
-                                resolve();
-                            } else {
-                                reject(response.errors);
-                            }
-                        });
-                    } else {
-                        reject(errorMessages);
-                    }
-                }*/
+                });
+            } else {
+                reject(errorMessages);
             }
         });
     }
@@ -284,7 +274,8 @@ module.exports = class {
                 // check flash duration is a number
                 if(typeof chainData[i].duration !== 'number'){
                     allOk = false;
-                    errorMessages.push(`Flash duration must be a number - occurred on stage ${i+1} light node ID # ${chainData[i].id}`);
+                    errorMessages.push(`Flash duration must be a number - occurred on stage ${i+1} light node ID # ${chainData[i].id}`);qwe
+
                 }
                 //check the flash durations are acceptable
                 if(chainData[i].duration < 0 || chainData[i].duration > 30 ){
@@ -658,11 +649,14 @@ module.exports = class {
     }
 
     disconnect(){
-        if(this.verbose){console.log("Stopping API connection");}
-        if(this.server !== ''){
-            this.server.close();
-        }
-        this.socket.close();
+        return new Promise((resolve)=>{
+            if(this.verbose){console.log("Stopping API connection");}
+            if(this.server !== ''){
+                this.server.close();
+            }
+            this.socket.close();
+            resolve();
+        });
     }
 
 

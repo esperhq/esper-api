@@ -2,9 +2,9 @@
 
 Welcome to the API wrapper for the Esper Control Suite
 
-This promised-based (ES6) wrapper gives you fine-grained control over how your Esper hardware behaves. The intention of this API wrapper is to expose every feature and functionality the hardware is capable of.
+This promised-based (ES6) wrapper gives you fine-grained control over how your Esper hardware behaves. The intention of this API wrapper is to expose every feature, and all functionality the hardware is capable of.
 
-This wrapper also includes a sandbox for you to test your scripts. You won't need the hardware to be connected to your pc and you can even test on computer that doesn't have the Control Suite installed.
+This wrapper also includes a sandbox for you to test your scripts. You won't need the hardware to be connected to your computer, you don't even need the Control Suite installed.
 
 #
 # Installation
@@ -19,24 +19,24 @@ npm install esper-api
 By default, the wrapper uses port 50005 to communicate with the API. It is necessary to allow this port in your firewall settings.
 In order to connect to the API in production mode, it is necessary to run the Esper Control Suite whenever you are interacting with the API
 
-This wrapper makes use of promises which are only available in Javascript ES6 (ECMA2015) onwards ( Node v10+)
+This wrapper makes use of promises which are only available in Javascript ES6 (ECMA2015) onwards (Node v10+)
 
 #
 ## Basic Usage - Connecting and Disconnecting
 
-Instantiate the Esper class;
+Instantiate the Esper class:
 
 ```javascript
 const esperClass = require('esper-api');
 const Esper = new esperClass();
 ```
-`esperClass()` can take two optional arguments. 
+`esperClass()` can take two optional arguments: 
 ```javascript
 esperClass(verbose = true, endpoint = 'localhost')
 ```
 #
 ### Async 
-Every method on the Esper object returns a promise
+Every method on the Esper object returns a promise.
 #
 #### Sandbox
 To use the Sandbox:
@@ -47,7 +47,7 @@ Esper.sandbox().then(()=>{
 ```
 
 #### Production
-to use the live version of the api, simply change the `Esper.sandbox()` method to `Esper.connect()` like so
+to use the live version of the api, simply change the `Esper.sandbox()` method to `Esper.connect()` like so:
 ```javascript
 Esper.connnect().then(()=>{
     // code to do things
@@ -59,7 +59,7 @@ The wrapper in sandbox mode creates is own socket.io server in order to simulate
 Esper.disconnect();
 ```
 This should only be called once your final promise has resolved.
-for example
+For example:
 
 ```javascript
 const esperClass = require('esper-api');
@@ -78,7 +78,7 @@ Esper.connnect().then(()=>{
 #
 ## Promises and error handling
 The `Esper.describeErrors(errors)` method prints a detailed readout of the errors which were raised. The argument for this method is the array of error strings that were raised by the wrapper. This makes it easy to create `.catch` blocks for the promises returned by the wrapper.
-for example: 
+For example: 
 ```javascript
 .catch((errors)=>{
     Esper.describeErrors(errors);
@@ -102,13 +102,13 @@ An example of what this would yield on the console is:
 
 ### List Available Light Nodes
 This returns an array of light node objects each with associated metadata.
-call it like so;
+Call it like so:
 ```javascript
 Esper.getAvailableLights().then((lights)=>{
     console.log(lights);  
 });
 ```
-This will print
+This will print:
 ```javascript
 [
     {   
@@ -135,9 +135,9 @@ This will print
       //...and so on
 ]
    ```
-Once this method has been called, the array of light node objects received is stored in the `Esper.availableLights` attribute
+Once this method has been called, the array of light node objects received is stored in the `Esper.availableLights` attribute.
 
-Each light node object has the following attributes;
+Each light node object has the following attributes:
 ```javascript
 {   
     id:1,                   //integer - used to uniquely identify a particular light on the rig
@@ -158,40 +158,40 @@ Each light node object has the following attributes;
 The modelling light can be set in two different manners: Globally or Individually
 
 #### Global Modelling Light
-To set the modelling light globally (each light illuminated the same), choose what brightnesses you want for each LED, then pass this as an array to `Esper.globalModellingLight()`
-For example 
+To set the modelling light globally (each light illuminated the same), choose what brightnesses you want for each LED, then pass this as an array to `Esper.globalModellingLight()`.
+For example:
 ```javascript
 let globalModellingLightPayload = [1, 3, 0.5]; 
 Esper.globalModellingLight(globalModellingLightPayload);
 ``` 
-would result in 1% brightness for the Horizontally polarised LED, 3% brightness for the Neutral LED and 0.5% brightness for the vertically polarised LED. The array indexes are the same as the `ledPolarisation` attribute on the light node object.
+This would result in 1% brightness for the Horizontally polarised LED, 3% brightness for the Neutral LED and 0.5% brightness for the vertically polarised LED. The array indexes are the same as the `ledPolarisation` attribute on the light node object.
  
  #### Individual modelling light
  It is possible to set individual modelling light brightnesses on each light node. 
+
 ```javascript
-let modellingLightPayload = [
-   {id:1,intensities:[3,0,0]},
-   {id:2,intensities:[1,2,3]},
-   {id:6,intensities:[3,2,1]}
-   // any lights not in the array are assumed to be dark
-];
-Esper.modellingLight(modellingLightPayload)
+let modellingLightPayload = {id:1,intensities:[3,0,0]};
+
+Esper.individualModellingLight(modellingLightPayload)
 ```
+calling `Esper.individualModellingLight()` only affects the light in question, allowing for very precise control over the static illumination of the rig
+
  #### Modelling light off
  To turn the modelling light off regardless of current configuration, use the command
- ```javascript01944999
- Esper.modellingLightOff()
+
+ ```javascript
+ Esper.modellingLightOff();
 ```
  
  
  
  
 ### Bullseye
-The bullseye method indicates where to look to the subject inside the dome. It achieves this by turning off the modelling light in a ring around the light node the subject should look at.
+The bullseye method indicates to the subject where to look inside the dome. It achieves this by turning off the modelling light in a ring around the light node the subject should look at.
 ```javascript
-Esper.bullseyeOn()
+Esper.bullseyeOn();
 
-Esper.bullseyeOff()
+Esper.bullseyeOff();
 ```
 Both of these methods return a promise so it would be possible to turn the bullseye on for 1 second with the following example
 ```javascript
@@ -210,7 +210,7 @@ Esper.bullseyeOn().then(()=>{
 #### Chain Mode
 Chain mode offers the user the ability to have fine-grained, multi-step directional lighting for the subject. Each light node can only flash once per take. In its longest form, this could be one light at a time, one after the other. 
 It is possible to have more than one light illuminate per step giving a large number of creative options. `Esper.chain()` takes an array as an argument. Each element in this array details what a particular light should do.
-An example of a single element is;
+An example of a single element is:
 ```javascript
 {
     id:1,                       //ID of the light node 
@@ -219,7 +219,7 @@ An example of a single element is;
     duration:1.99               // Flash duration in ms. 0 < flashDuration <= 30 ms
 }
 ```
-Specifying multiple light node behaviours creates a chain mode payload
+Specifying multiple light node behaviours creates a chain mode payload:
 ```javascript
 let chainPayload = [
     {
@@ -257,7 +257,7 @@ Esper.chain(chainPayload)
         Esper.describeErrors(err);
     });
 ```
-This example result in a lighting profile with 3 stages. In the first stage, only light node 1 flashes, on the second stage light nodes 2 and 3 flash, and the third and final stage is where light 4 flashes all three LEDs.
+This example result in a lighting profile with 3 stages. In the first stage, only light node 1 flashes, on the second stage light nodes 2 and 3 flash, and the third and final stage is where light 4 flashes all three of its LEDs.
 
 
 #### Sequencer Mode
@@ -265,7 +265,7 @@ Sequencer mode allows you to create complex lighting stages. Each light stage is
 
 The payload sent to the `Esper.sequence(payload)` method is an array of lighting stages.
 
-Each light stage has the following attributes;
+Each light stage has the following attributes:
 ```javascript
 [
     {id:1,intensities:[0,0,75.00],duration:5.5},
@@ -276,10 +276,10 @@ Each light stage has the following attributes;
     {id:156,intensities:[0,100,0],duration:10.55},
 ]
 ```
-The ID parameter is the ID of the light, the intensities are the brighnesses you want each LED to flash at and the duration is the flash duration for that light in ms
+The ID parameter is the ID of the light, the intensities are the brighnesses you want each LED to flash at and the duration is the flash duration for that light in ms.
 
 
-Multiple light stages are then assembled into a full payload 
+Multiple light stages are then assembled into a full payload :
 ```javascript
 let sequencePayload =[
     [   // Stage 1
@@ -320,7 +320,7 @@ It is possible to start the capture process by calling `Esper.trigger()` without
 ```javascript
 Esper.trigger();
 ```
-This will trigger the capture with default parameters listed below
+This will trigger the capture with default parameters listed below:
 
 ```javascript
 let triggerArgs = {
