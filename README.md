@@ -118,7 +118,7 @@ This will print:
         ledPolarisation:['horizontal','neutral','vertical'],
         line:0,
         address:1,
-        maxFlashDuration:50,
+        maxFlashDuration:30,
         maxModellingLight:0.03,
         maxLightStages:32
     },          
@@ -128,7 +128,7 @@ This will print:
         ledPolarisation:['horizontal','neutral','vertical'],
         line:0,
         address:2,
-        maxFlashDuration:50,
+        maxFlashDuration:30,
         maxModellingLight:0.03,
         maxLightStages:32
     },
@@ -214,9 +214,9 @@ It is possible to have more than one light illuminate per step giving a large nu
 An example of a single element is:
 ```javascript
 {
-    id:1,                       //ID of the light node 
-    stage:2,                    //the step on which this light is to flash. (this example, light #1 will flash on the second exposure)
-    intensities:[0.99,0.5,0],   //Flash Illumination intensities for each of the LEDs on the light node. (0-100 %)
+    id:1,                       // ID of the light node 
+    stage:2,                    // the step on which this light is to flash. (this example, light #1 will flash on the second exposure)
+    intensities:[99,50,0],      // Flash Illumination intensities for each of the LEDs on the light node. (0-100 %)
     duration:1.99               // Flash duration in ms. 0 < flashDuration <= 30 ms
 }
 ```
@@ -243,10 +243,10 @@ let chainPayload = [
     },
     {
         id:4,
-        stage:3,https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-datahttps://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data
+        stage:3,
         intensities:[100,100,100],
         duration:10,
-    },
+    }
 ];
 
 Esper.chain(chainPayload)
@@ -262,7 +262,7 @@ This example result in a lighting profile with 3 stages. In the first stage, onl
 
 
 #### Sequencer Mode
-Sequencer mode allows you to create complex lighting stages. Each light stage is independant from the one that came before it, so unlike chain mode, each light can flash on as many light stages as you like. There is a maximum of 32 light stages.
+Sequencer mode allows you to create complex lighting stages. Each light stage is independent from the one that came before it, so unlike chain mode, each light can flash on as many light stages as you like. There is a maximum of 32 light stages.
 
 The payload sent to the `Esper.sequence(payload)` method is an array of lighting stages.
 
@@ -270,7 +270,7 @@ Each light stage has the following attributes:
 ```javascript
 [
     {id:1,intensities:[0,0,75.00],duration:5.5},
-    {id:2,intensities:[100,0,0]https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data,duration:5},
+    {id:2,intensities:[100,0,0], duration: 5.5},
     {id:3,intensities:[100,0,0],duration:5},
     {id:4,intensities:[0,100,0],duration:3},
     //...

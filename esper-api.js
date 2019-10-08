@@ -28,6 +28,7 @@ module.exports = class {
                     resolve();
                 }).catch((err)=>{
                     console.log(err);
+                    console.err("Connection error");
                     reject(['failed to start up correctly - could not detect connected lights'])
                 });
 
@@ -221,11 +222,18 @@ module.exports = class {
     * */
     chain(chainData){
         return new Promise((resolve,reject)=>{
+            console.log("Configuring chain mode");
             let allOk = true;
             let idsUsed = [];
             let errorMessages = [];
 
-            for(let i=0;i<chainData.length;i++){
+            if (typeof chainData == "undefined"){
+                allOk = false;
+                errorMessages.push("chainData not defined");
+                reject(errorMessages);
+            }
+
+            for(let i=0; i<chainData.length; i++){
 
                 //check there aren't duplicate ids
                 if(idsUsed.includes(chainData[i].id)){
@@ -295,11 +303,26 @@ module.exports = class {
 
     }
 
+    exitChainMode(){
+        return new Promise((resolve, reject) => {
+            console.log("Exiting chain mode");
+            this.socket.emit("api-exit-chain-mode", (exitStatus)=>{
+                if (exitStatus === true){
+                    resolve();
+                }
+                else{
+                    reject();
+                }
+            })
+        });
+    }
+
     /*
     *   Allows the programming of custom light stages - intricate control over each lighting stage
     * */
     sequence(sequenceData){
         return new Promise((resolve,reject)=>{
+            console.log("Uploading Sequence payload");
             let allOk = true;
             let errorMessages = [];
             // check number of stages
@@ -431,6 +454,22 @@ module.exports = class {
                 triggerPayload.stages = 0;
             }
 
+            if(args.hasOwnProperty('fps')){
+                if(typeof (args.fps) === 'number' ){
+                    if( args.fps >= 0){
+                        triggerPayload.fps = args.fps;
+                    }else{
+                        allOk = false;
+                        errorMessages.push('fps must be above 0');
+                    }
+                }else{
+                    allOk = false;
+                    errorMessages.push('fps must be a number');
+                }
+            }else{
+                triggerPayload.fps = 0;
+            }
+
             if(args.hasOwnProperty('start')){
                 if(typeof (args.start) === 'number' && !(args.start%1)){
                     if( args.start <= 32 && args.start >=0){
@@ -533,10 +572,63 @@ module.exports = class {
         });
     }
 
+    testFlash(){
+        return new Promise((resolve, reject)=>{
+            console.log("test flash");
+            this.socket.emit('api-test-flash', (response)=>{
+                if(response.status){
+                    resolve();
+                }else{
+                    reject(response.errors);
+                }
+            });
+        });
+    }
 
+    setCurrentSequencePoint(newSequencePoint){
+        return new Promise((resolve, reject)=>{
+            console.log("Setting sequence point:" + newSequencePoint);
+            this.socket.emit("api-set-current-sequence-position", newSequencePoint, (response)=>{
+                if (response.status === true){
+                    resolve();
+                }
+                else{
+                    reject(response.errors);
+                }
+            })
+        });
+    }
 
+    waitMillis(millisToWait = 0){
+        return new Promise(((resolve) => {
+            let numDots = 10;
+            process.stdout.write("waiting");
+            for (let i = 0; i< numDots; i++){
+                setTimeout(()=>{
+                    process.stdout.write(".");
+                },
+                (millisToWait/numDots)*i);
+            }
+            setTimeout(()=>{
+                resolve();
+                console.log();
+            },
+            millisToWait);
+        }));
+    }
 
-    describeErrors(errors){
+    describeErrors(errorsInput){
+        let errors;
+        if (typeof errorsInput === "undefined"){
+            errorsInput = "";
+        }
+        if (typeof errorsInput === "string"){
+            errors = [errorsInput];
+        }
+        else {
+            errors = errorsInput;
+        }
+
         let longestMessage = 52;
         for(let i=0;i<errors.length;i++){
             if((errors[i].length+11) > longestMessage){
