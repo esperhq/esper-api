@@ -342,6 +342,43 @@ Esper.trigger( triggerArgs )
         Esper.describeErrors(errs);
     });
 ```
+
+# Continuous Capture
+Continuous capture allows for an ongoing triggering of the cameras and the flashes. As of this release it only works with an MV setup. It allows for a "start-stop" style of operation. The framerate, trigger actuation duration and flash lag are taken as arguments to 
+
+
+In order for continuous capture to work, it is imperative that you upload 32 stages of lighting information to the multiflash, without a full set of 32 stages the multiflash will be unable to loop around.
+```javascript
+Esper.continuousCapture({
+    fps:120,
+    flashLag:1,   //milliseconds
+    triggerDuration:2  //milliseconds
+})
+```
+This will freerun capture indefinitely until told to stop
+
+```javascript
+    Esper.stopContinuousCapture();
+```
+A mini-example of a 120fps capture for 1 second would be:
+
+```javascript
+Esper.continuousCapture({
+    fps:120,
+    flashLag:1,   //milliseconds
+    triggerDuration:2  //milliseconds
+})
+.then(()=>{
+    return new Promise((resolve)=>{         //promise to deal with async stuff
+        setTimeout(()=>{                    //timeout to get a 1 second (1000ms) delay
+            Esper.stopContinuousCapture()   //stop the capture
+            .then(resolve);                 //resolve the promise to move on to the next then
+        },1000)
+    })
+})
+.then(Esper.disconnect)
+```
+
 # Examples
 
 Let's create a worked example of a mini rig with 6 lights. We will connect to the Esper API, upload a lighting profile to the rig, turn the modelling light on for 10 seconds, then turn it off before triggering the cameras.

@@ -188,7 +188,9 @@ module.exports = class {
     * */
     modellingLightOff(){
         return new Promise((resolve,reject)=>{
-            this.globalModellingLight([0,0,0]).then(()=>{resolve();}).catch((err)=>{reject(err)});
+            this.globalModellingLight([0,0,0])
+                .then(resolve)
+                .catch((err)=>{reject(err)});
         });
     }
 
@@ -353,7 +355,6 @@ module.exports = class {
                         errorMessages.push(`Duplicate light ID in stage ${i+1} - id # ${sequenceData[i][j].id} duplicated`);
                     }
                     idsUsed.push(sequenceData[i][j].id);
-
                     // check id exists
                     if(!this.nodeExists(sequenceData[i][j].id)) {
                         allOk = false;
@@ -585,6 +586,106 @@ module.exports = class {
         });
     }
 
+    continuousCapture(args){
+        return new Promise((resolve,reject)=>{
+            let allOk = true;
+            let toSend = {};
+            let errorMessages = [];
+
+            if(typeof args.fps === 'undefined'){
+                toSend.fps = 100;
+            }else{
+                if(!Number.isInteger(args.fps)){
+                    allOk = false;
+                    errorMessages.push('fps must be an integer')
+                }else{
+                    toSend.fps = args.fps;
+                }
+            }
+
+
+            if(typeof args.flashLag === 'undefined'){
+                toSend.flashLag = 0;
+            }else{
+                if(!Number.isInteger(args.flashLag)){
+                    allOk = false;
+                    errorMessages.push('flashLag must be an integer (milliseconds)')
+                }else{
+                    toSend.flashLag = args.flashLag;
+                }
+            }
+
+            if(typeof args.triggerDuration === 'undefined'){
+                toSend.triggerDuration = 5;
+            }else{
+                if(!Number.isInteger(args.triggerDuration)){
+                    allOk = false;
+                    errorMessages.push('triggerDuration must be an integer (milliseconds)')
+                }else{
+                    toSend.triggerDuration = args.triggerDuration;
+                }
+            }
+
+            if(allOk){
+                this.socket.emit('api-continuous-sequence-start',toSend,(response)=>{
+                    if (response.status === true){
+                        resolve();
+                    }
+                    else{
+                        reject(response.errors);
+                    }
+                })
+            }else{
+                reject(errorMessages);
+            }
+        });
+
+    }
+
+    stopContinuousCapture(){
+        return new Promise((resolve,reject)=>{
+            this.socket.emit('api-continuous-sequence-stop',(response)=>{
+                if (response.status === true){
+                    resolve();
+                }
+                else{
+                    reject(response.errors);
+                }
+            })
+        })
+    }
+
+    writeEEPROMAddresses(){
+        return new Promise((resolve,reject)=>{
+            this.socket.emit('api-write-eeprom-addresses',(response)=>{
+                if (response.status === true){
+                    resolve();
+                }
+                else{
+                    reject(response.errors);
+                }
+            });
+        })
+    }
+
+    setNodeChain(rigPattern,nodeString,nodeTypeId = 1){
+        return new Promise((resolve,reject)=>{
+            let rigData = {
+                wiringSequence: nodeString,
+                name: rigPattern,
+                nodeModelID:nodeTypeId,
+            };
+            this.socket.emit('set-rig',rigData,(response)=>{
+                if (response.status === true){
+                    resolve();
+                }
+                else{
+                    reject(response.errors);
+                }
+            });
+        })
+    }
+
     setCurrentSequencePoint(newSequencePoint){
         return new Promise((resolve, reject)=>{
             console.log("Setting sequence point:" + newSequencePoint);
@@ -599,7 +700,130 @@ module.exports = class {
         });
     }
 
-    waitMillis(millisToWait = 0){
+    animate(){
+        this.socket.emit("api-animate", (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    getShutterLag(){
+        this.socket.emit("api-get-shutter-lag", (response)=>{
+            if (response.status === true){
+                resolve(response.payload);
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    measureCameraPerformance(){
+        this.socket.emit("api-measure-camera-performance", (response)=>{
+            if (response.status === true){
+                resolve(response.payload);
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    loadLightNodeIDs(){
+        this.socket.emit("api-load-light-node-ids", (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+
+    resetLightNodes(){
+        this.socket.emit("api-reset-light-nodes", (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+
+    debugDataLine(debugging){
+        this.socket.emit("api-debug-data-line", debugging, (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    pingAllNodes(){
+        this.socket.emit("api-ping-all-nodes", (response)=>{
+            if (response.status === true){
+                resolve(respose.payload);
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    checkRigFunctionality(){
+        this.socket.emit("api-check-rig-functionality", (response)=>{
+            if (response.status === true){
+                resolve(response.payload);
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    assertFocus(focusing){
+        this.socket.emit("api-assert-focus", focussing, (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    assertTrigger(triggering){
+        this.socket.emit("api-assert-trigger", triggering, (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    assertTriggerAndCount(frames){
+        this.socket.emit("api-assert-shutter-and-count", frames, (response)=>{
+            if (response.status === true){
+                resolve();
+            }
+            else{
+                reject(response.errors);
+            }
+        })
+    }
+
+    wait(millisToWait = 0){
         return new Promise(((resolve) => {
             let numDots = 10;
             process.stdout.write("waiting");
@@ -618,6 +842,7 @@ module.exports = class {
     }
 
     describeErrors(errorsInput){
+        console.log(errorsInput);
         let errors;
         if (typeof errorsInput === "undefined"){
             errorsInput = "";
@@ -696,37 +921,37 @@ module.exports = class {
                     callback({status:true,lights:[
                             {   id:1,
                                 xyz:[0,0,0],
-                                ledPolarisation:['horisonal','neutral','vertical'],
+                                ledPolarisation:['horizontal','neutral','vertical'],
                                 maxFlashDuration:50,
                                 maxModellingLight:0.03,
                                 maxLightStages:32},
                             {   id:2,
                                 xyz:[200,0,0],
-                                ledPolarisation:['horisonal','neutral','vertical'],
+                                ledPolarisation:['horizontal','neutral','vertical'],
                                 maxFlashDuration:50,
                                 maxModellingLight:0.03,
                                 maxLightStages:32},
                             {   id:3,
                                 xyz:[400,0,0],
-                                ledPolarisation:['horisonal','neutral','vertical'],
+                                ledPolarisation:['horizontal','neutral','vertical'],
                                 maxFlashDuration:50,
                                 maxModellingLight:0.03,
                                 maxLightStages:32},
                             {   id:4,
                                 xyz:[600,0,0],
-                                ledPolarisation:['horisonal','neutral','vertical'],
+                                ledPolarisation:['horizontal','neutral','vertical'],
                                 maxFlashDuration:50,
                                 maxModellingLight:0.03,
                                 maxLightStages:32},
                             {   id:5,
                                 xyz:[800,0,0],
-                                ledPolarisation:['horisonal','neutral','vertical'],
+                                ledPolarisation:['horizontal','neutral','vertical'],
                                 maxFlashDuration:50,
                                 maxModellingLight:0.03,
                                 maxLightStages:32},
                             {   id:6,
                                 xyz:[1000,0,0],
-                                ledPolarisation:['horisonal','neutral','vertical'],
+                                ledPolarisation:['horizontal','neutral','vertical'],
                                 maxFlashDuration:50,
                                 maxModellingLight:0.03,
                                 maxLightStages:32},
@@ -739,13 +964,11 @@ module.exports = class {
     }
 
     disconnect(){
-        return new Promise((resolve)=>{
-            if(this.verbose){console.log("Stopping API connection");}
-            if(this.server !== ''){
-                this.server.close();
-            }
-            this.socket.close();
-            resolve();
-        });
+        if(this.verbose){console.log("Stopping API connection");}
+        if(this.server !== ''){
+            this.server.close();
+        }
+        this.socket.close();
     }
+
 };
