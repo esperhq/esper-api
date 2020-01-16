@@ -588,56 +588,24 @@ module.exports = class {
 
     continuousCapture(args){
         return new Promise((resolve,reject)=>{
-            let allOk = true;
-            let toSend = {};
-            let errorMessages = [];
 
             if(typeof args.fps === 'undefined'){
-                toSend.fps = 100;
-            }else{
-                if(!Number.isInteger(args.fps)){
-                    allOk = false;
-                    errorMessages.push('fps must be an integer')
-                }else{
-                    toSend.fps = args.fps;
-                }
+                args.fps = 100;
             }
-
-
             if(typeof args.flashLag === 'undefined'){
-                toSend.flashLag = 0;
-            }else{
-                if(!Number.isInteger(args.flashLag)){
-                    allOk = false;
-                    errorMessages.push('flashLag must be an integer (milliseconds)')
-                }else{
-                    toSend.flashLag = args.flashLag;
-                }
+                args.flashLag = 0;
             }
-
             if(typeof args.triggerDuration === 'undefined'){
-                toSend.triggerDuration = 5;
-            }else{
-                if(!Number.isInteger(args.triggerDuration)){
-                    allOk = false;
-                    errorMessages.push('triggerDuration must be an integer (milliseconds)')
-                }else{
-                    toSend.triggerDuration = args.triggerDuration;
+                args.triggerDuration = 5;
+            }
+            this.socket.emit('api-continuous-sequence-start',args,(response)=>{
+                if (response.status === true){
+                    resolve();
                 }
-            }
-
-            if(allOk){
-                this.socket.emit('api-continuous-sequence-start',toSend,(response)=>{
-                    if (response.status === true){
-                        resolve();
-                    }
-                    else{
-                        reject(response.errors);
-                    }
-                })
-            }else{
-                reject(errorMessages);
-            }
+                else{
+                    reject(response.errors);
+                }
+            })
         });
 
     }

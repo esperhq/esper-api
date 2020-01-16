@@ -13,9 +13,12 @@ Esper.connect()
 
     .then(()=>{
         return Esper.continuousCapture({
-            fps:40,
-            flashLag:0,   //milliseconds
-            triggerDuration:2  //milliseconds
+            fps:20,
+            flashLag:0,                 //milliseconds
+            triggerDuration:2,          //milliseconds
+            triggerOutput:'gp1',        //  (cc1,cc2,gp1,gp2)
+            triggerChannel:'a',         // (a, b)
+            triggerType:'5v'            // (5v, cc, diff)
         })
     })
 
