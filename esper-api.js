@@ -12,7 +12,6 @@ module.exports = class {
         this.verbose = verbose;
     };
 
-
     /*
     *   Bootstraps the Esper API wrapper
     * */
@@ -52,9 +51,11 @@ module.exports = class {
             if(this.connected){
                 this.socket.emit('api-get-available-lights',(payload)=>{
                     if(payload.status){
-                        if(this.verbose){console.log(`Detected available lights - there are ${payload.lights.length} lights`);}
-                        this.availableLights = payload.lights;
-                        resolve(payload.lights);
+                        if (payload.lights){ // not preset if starting api/controlsuite without using config.
+                            if(this.verbose){console.log(`Detected available lights - there are ${payload.lights.length} lights`);}
+                            this.availableLights = payload.lights;
+                            resolve(payload.lights);
+                        }
                     }else{
                         reject(payload.errors);
                     }
@@ -808,6 +809,27 @@ module.exports = class {
             millisToWait);
         }));
     }
+
+    useBackendTerminalCommand(termCommand){
+        this.socket.emit("api-terminal", termCommand, (respobject)=>{
+            if (respobject.messageBack === "ACK"){
+                console.log("running command: " + termCommand);
+            }
+        });
+    }
+
+    testBackendTerminalCommand(testCommand, onTested){
+        this.socket.emit("api-terminal-test-command", testCommand, (respobject)=>{
+            //console.log(respobject);
+            onTested(respobject);
+            // if (respobject.validCommands){
+            //     for (let vc of respobject.validCommands){
+            //         console.log(vc);
+            //     }
+            // }
+        });
+    }
+
 
     describeErrors(errorsInput){
         console.log(errorsInput);
