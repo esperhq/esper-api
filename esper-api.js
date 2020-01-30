@@ -791,6 +791,19 @@ module.exports = class {
         })
     }
 
+    rewindSequencePoint(){
+        return new Promise((resolve,reject)=>{
+           this.socket.emit('rewind-sequence-point',(response)=>{
+               //todo this does not conform to standardised esper ws syntax
+                if(response){
+                    resolve();
+                }else{
+                    reject(['Could not rewind sequence point']);
+                }
+           })
+        });
+    }
+
     wait(millisToWait = 0){
         return new Promise(((resolve) => {
             let numDots = 10;
