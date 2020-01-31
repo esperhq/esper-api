@@ -1,14 +1,16 @@
-site_name: Esper API Wrapper
+site_name: API Wrapper
 theme:
   name: 'material'
   palette:
     primary: 'black'
-    accent: 'yellow'
+    accent: '#FFC715'
   favicon: './assets/icon.ico'
   logo: './assets/esper-logo-trimmed.svg'
   font:
-    text: 'Proxima Nova'
-    code: 'Proxima Nova Mono'
+    text: 'proxima-nova'
+#    code: 'Proxima Nova Mono'
 repo_name: 'esperhq/esper-api'
 repo_url: 'https://github.com/esperhq/esper-api'
 extra_css: [esperStyle.css]
+markdown_extensions:
+  - codehilite

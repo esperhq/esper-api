@@ -138,6 +138,14 @@ Esper.connect()
             captureMode: 'mv'})
     })
 
+let args ={
+    frames:15,
+    fps:8,
+
+}
+
+
+
     .then(()=>{
         Esper.disconnect();
     })

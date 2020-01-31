@@ -73,7 +73,6 @@ module.exports = class {
         return connectedNodes.includes(id);
     }
 
-
     /*
     *   Turns on the modelling light - steady state lighting for each light node
     * */
@@ -803,6 +802,19 @@ module.exports = class {
            })
         });
     }
+
+    exportSettings(){
+        return new Promise((resolve,reject)=>{
+           resolve('someSettings');
+        });
+    }
+
+    saveConfiguration(configToSave){
+        return new Promise((resolve,reject)=>{
+           resolve(true);
+        });
+    }
+
 
     wait(millisToWait = 0){
         return new Promise(((resolve) => {
