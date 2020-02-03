@@ -1,6 +1,6 @@
 const readline = require('readline');
 const EsperFactory = require("./esper-api.js");
-let Esper = new EsperFactory(true, "192.168.1.50");
+let Esper = new EsperFactory(true);
 Esper.connect();
 readline.emitKeypressEvents(process.stdin);
 
@@ -10,7 +10,9 @@ let previousCommandIndex = -1;
 try{
     process.stdin.setRawMode(true);
     process.stdout.cursorTo(0,0, ()=>{
-        process.stdout.clearScreenDown(()=>{});
+        process.stdout.clearScreenDown(()=>{
+            process.stdout.write("Started CLI applet. Attempting to connect to controlSuite...");
+        });
     })
 }
 catch(err){
@@ -73,3 +75,6 @@ process.stdin.on('keypress', (str, key) => {
     }
 });
 
+function writeToScreen(toWrite, onWritten){
+    process.stdout.write(toWrite, onWritten);
+}
