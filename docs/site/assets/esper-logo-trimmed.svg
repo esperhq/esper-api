@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 6005.9 1603.3"
+   style="enable-background:new 0 0 6005.9 1603.3;"
+   xml:space="preserve"
+   sodipodi:docname="esper-logo-trimmed.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
+   id="metadata3807"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title>Esper Logo Nav</dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs3805" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1015"
+   id="namedview3803"
+   showgrid="false"
+   inkscape:zoom="0.29337818"
+   inkscape:cx="3002.95"
+   inkscape:cy="392.62165"
+   inkscape:window-x="1920"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<style
+   type="text/css"
+   id="style3780">
+	.st0{fill:#FFC715;}
+	.st1{fill:#FFFFFF;}
+</style>
+<title
+   id="title3782">Esper Logo Nav</title>
+<desc
+   id="desc3784">Created with Sketch.</desc>
+<g
+   id="Symbols"
+   transform="translate(279.50272,10.225709)">
+	<g
+   id="Nav-Responsive"
+   transform="translate(-15,-14)">
+		<g
+   id="Esper-Logo-Nav"
+   transform="translate(15,14)">
+			<g
+   id="Page-1">
+				<polygon
+   id="Fill-1"
+   class="st0"
+   points="979.3,362.1 979.3,6.8 0,6.8 0,240.8 0,362.1 "
+   style="fill:#ffc715" />
+				<g
+   id="Group-11"
+   transform="translate(0,0.521845)">
+					<path
+   id="Fill-2"
+   class="st0"
+   d="m 1490.6,588.8 h -433.3 c 34.7,130 147.3,260 294.7,303.3 l 260,78 c 78,26 112.7,78 112.7,130 0,78 -60.7,138.7 -138.7,138.7 H 355.3 V 935.5 H 710.6 V 588.8 H 0 v 329.3 320.7 60.7 303.3 h 1586 c 268.7,0 485.3,-216.7 485.3,-494 0,-242.7 -164.7,-520 -580.7,-520"
+   inkscape:connector-curvature="0"
+   style="fill:#ffc715" />
+					<polygon
+   id="Fill-4"
+   class="st1"
+   points="3275.9,918.1 3275.9,1238.8 3275.9,1290.8 3275.9,1594.1 4255.3,1594.1 4255.3,1238.8 3631.3,1238.8 3631.3,935.5 3986.6,935.5 3986.6,588.8 3275.9,588.8 "
+   style="fill:#ffffff" />
+					<g
+   id="Group-8"
+   transform="translate(11.509615)">
+						<g
+   id="Clip-7">
+						</g>
+						<path
+   id="Fill-6"
+   class="st1"
+   d="M 2693.3,8.1 H 1480 c -216.7,0 -398.7,156 -442,364 h 433.3 v 0 h 468 v 0 h 780 c 78,0 138.7,60.7 138.7,130 0,60.7 -26,95.3 -86.7,121.3 l -442,216.7 c -112.7,52 -208,121.3 -208,355.3 v 407.3 h 355.3 v -416 l 398.7,-208 c 156,-78 320.7,-234 320.7,-468 C 3204.6,224.8 3031.3,8.1 2693.3,8.1"
+   inkscape:connector-curvature="0"
+   style="fill:#ffffff" />
+					</g>
+					<path
+   id="Fill-9"
+   class="st0"
+   d="m 5425.2,493.5 c 0,-268.7 -173.3,-494 -537.3,-494 h -1612 v 355.3 h 1664 c 78,0 138.7,60.7 138.7,130 0,60.7 -34.7,104 -86.7,121.3 -8.7,8.7 -442,216.7 -442,216.7 -112.7,52 -208,121.3 -208,355.3 v 407.3 h 355.3 v -416 l 147.3,-86.7 199.3,502.7 h 381.3 L 5156.4,918.1 c 8.8,8.7 268.8,-121.3 268.8,-424.6"
+   inkscape:connector-curvature="0"
+   style="fill:#ffc715" />
+				</g>
+			</g>
+		</g>
+	</g>
+</g>
+
+</svg>

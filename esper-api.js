@@ -377,22 +377,6 @@ module.exports = class {
     }
 
 
-    // TJG commented out... no longer needed.
-    // exitChainMode(){
-    //     return new Promise((resolve, reject) => {
-    //         console.log("Exiting chain mode");
-    //         this.socket.emit("api-exit-chain-mode", (exitStatus)=>{
-    //             if (exitStatus === true){
-    //                 resolve();
-    //             }
-    //             else{
-    //                 reject();
-    //             }
-    //         })
-    //     });
-    // }
-
-
     /**
      *
      * @param sequenceData
@@ -904,6 +888,7 @@ module.exports = class {
             })
         });
     }
+<<<<<<< HEAD
 
     scan(args){
         return new Promise((resolve,reject)=>{
@@ -918,6 +903,8 @@ module.exports = class {
     }
 
 
+=======
+>>>>>>> docs continuing
 
     wait(millisToWait = 0){
         return new Promise(((resolve) => {
@@ -1025,9 +1012,6 @@ module.exports = class {
         // }
         // console.log(wideString);
     }
-
-
-
 
 
     disconnect(){
