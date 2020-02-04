@@ -5,7 +5,7 @@ Esper API allows a two-way real time communication with the Esper Control Suite.
 ## Languages
 This API wrapper is written for NodeJS using [Socket.IO](http://socket.io) for communication
 
-Socket.IO provides bindings for most programming languages, so while the Esper API wrapper is currently only written in node, it is possible to write your own API wrapper in a language of your choice. See [Advanced Endpoints](92-usingOtherLanguages.md) for socket.IO endpoint information for creating your own wrapper.
+There are Socket.IO bindings for most programming languages, so while the Esper API wrapper is written in Node.js, it is possible to write your own API wrapper in a language of your choice. See [API in other programming languages](92-usingOtherLanguages.md) for socket.IO endpoint information for creating your own wrapper.
 
 
 ## Installation

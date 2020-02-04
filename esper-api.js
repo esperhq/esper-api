@@ -815,6 +815,17 @@ module.exports = class {
         });
     }
 
+    findControllerBox(){
+        return new Promise((resolve,reject)=>{
+            this.socket.emit('controller-box-start',(response)=>{
+                if(response){
+                    resolve();
+                }else{
+                    reject(['Could not rewind sequence point']);
+                }
+            })
+        });
+    }
 
     wait(millisToWait = 0){
         return new Promise(((resolve) => {
@@ -891,70 +902,7 @@ module.exports = class {
     }
 
 
-    sandbox(){
-        return new Promise((resolve,reject)=>{
-            if(this.verbose){console.log("starting server");}
-            this.server = require('socket.io').listen(this.port);
-            this.server.on('connection',(socket)=>{
-                if(this.verbose){console.log("server detected a client connection");}
-                socket.on('api-set-global-modelling-light',(modellingLight,callback)=>{
-                    callback({status:true});
-                });
-                socket.on('api-set-individual-modelling-light',(modellingLight,callback)=>{
-                    callback({status:true});
-                });
-                socket.on('api-upload-chain-mode-sequence',(chainModeData,callback)=>{
-                    callback({status:true});
-                });
-                socket.on('api-upload-sequencer-mode-sequence',(sequenceModeData,callback)=>{
-                    callback({status:true});
-                });
 
-                socket.on('api-get-available-lights',(callback)=>{
-                    callback({status:true,lights:[
-                            {   id:1,
-                                xyz:[0,0,0],
-                                ledPolarisation:['horizontal','neutral','vertical'],
-                                maxFlashDuration:50,
-                                maxModellingLight:0.03,
-                                maxLightStages:32},
-                            {   id:2,
-                                xyz:[200,0,0],
-                                ledPolarisation:['horizontal','neutral','vertical'],
-                                maxFlashDuration:50,
-                                maxModellingLight:0.03,
-                                maxLightStages:32},
-                            {   id:3,
-                                xyz:[400,0,0],
-                                ledPolarisation:['horizontal','neutral','vertical'],
-                                maxFlashDuration:50,
-                                maxModellingLight:0.03,
-                                maxLightStages:32},
-                            {   id:4,
-                                xyz:[600,0,0],
-                                ledPolarisation:['horizontal','neutral','vertical'],
-                                maxFlashDuration:50,
-                                maxModellingLight:0.03,
-                                maxLightStages:32},
-                            {   id:5,
-                                xyz:[800,0,0],
-                                ledPolarisation:['horizontal','neutral','vertical'],
-                                maxFlashDuration:50,
-                                maxModellingLight:0.03,
-                                maxLightStages:32},
-                            {   id:6,
-                                xyz:[1000,0,0],
-                                ledPolarisation:['horizontal','neutral','vertical'],
-                                maxFlashDuration:50,
-                                maxModellingLight:0.03,
-                                maxLightStages:32},
-                        ]});
-                });
-            });
-
-            this.connect().then(()=>{resolve()});
-        });
-    }
 
     disconnect(){
         if(this.verbose){console.log("Stopping API connection");}

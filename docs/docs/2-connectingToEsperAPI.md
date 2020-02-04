@@ -12,7 +12,7 @@ You can then connect to the API by calling the connect method like so:
 Esper.connect();
 
 ```
-
+___
 ## Constructor arguments
 The constructor for the Esper class takes three optional arguments.
 ```javascript
