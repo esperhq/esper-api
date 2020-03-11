@@ -1,10 +1,12 @@
 const io = require('socket.io-client');
 
+let apiVersionCompatibility = "0.7.14";
+
 module.exports = class {
+    socket;
 
     constructor(verbose = true, endpoint = 'http://localhost', port = 50005){
         this.endpoint = endpoint+':'+port;
-        this.socket='';
         this.port = port;
         this.server='';
         this.availableLights = [];
@@ -22,10 +24,21 @@ module.exports = class {
             this.socket.on('connect',()=>{
                 if(this.verbose){console.log("Connected to Esper API");}
                 this.connected = true;
-                this.getAvailableLights().then((theLights)=>{
-                    this.availableLights = theLights;
+                this.getAvailableLights()
+                // .then((theLights)=>{ // TJG Commented out as available lights already set in above function
+                //     this.availableLights = theLights;
+                // })
+                .then(()=>{
+                    return this.getControlSuiteVersion();
+                }).then((versionString)=>{
+                    if (versionString !== apiVersionCompatibility){
+                        console.warn("WARN: api version and ControlSuite version mistmatch");
+                        console.warn("Please update api to latest version");
+                    }
+                }).then(()=>{
                     resolve();
-                }).catch((err)=>{
+                })
+                .catch((err)=>{
                     console.log(err);
                     console.err("Connection error");
                     reject(['failed to start up correctly - could not detect connected lights'])
@@ -33,13 +46,13 @@ module.exports = class {
 
             });
 
-
             this.socket.on('disconnect',()=>{
                 if(this.verbose){console.log("Disconnected from Esper API");}
                 this.connected = false;
             });
         });
     }
+
 
 
 
@@ -217,13 +230,33 @@ module.exports = class {
         });
     }
 
-    //todo version checking
+    /**
+     *
+     * @returns {Promise<string>}
+     */
+    getControlSuiteVersion(){
+        return new Promise((resolve, reject)=>{
+           this.socket.emit("api-get-version-number", (response)=>{
+               if (typeof response === "string"){
+                   console.log(response);
+                   resolve(response);
+               }
+               else {
+                   reject("no version specified...");
+               }
+           })
+        });
+    }
 
-    /*
-    *   Chain mode is for being able to take many photos - each light can only flash once
-    * */
-    chain(chainData){
-        return new Promise((resolve,reject)=>{
+
+
+    /**
+     * Chain mode is for being able to take many photos - each light can only flash once
+     * @param {ChainModeDataInstance[]} chainData
+     * @returns {Promise<void>}
+     */
+    configureChainMode(chainData){
+        return new Promise((resolve, reject) => {
             console.log("Configuring chain mode");
             let allOk = true;
             let idsUsed = [];
@@ -235,10 +268,10 @@ module.exports = class {
                 reject(errorMessages);
             }
 
-            for(let i=0; i<chainData.length; i++){
+            for (let i = 0; i < chainData.length; i++){
 
                 //check there aren't duplicate ids
-                if(idsUsed.includes(chainData[i].id)){
+                if (idsUsed.includes(chainData[i].id)){
                     allOk = false;
                     errorMessages.push(`Duplicate Light IDs were passed - #${chainData[i].id} was passed multiple times`);
                 }
@@ -246,82 +279,125 @@ module.exports = class {
 
 
                 //check the id is associated with a node we have detected
-                if(!this.nodeExists(chainData[i].id)){
+                if (!this.nodeExists(chainData[i].id)){
                     allOk = false;
                     errorMessages.push(`Invalid Light ID was passed - ID ${chainData[i].id} does not exist`);
                 }
 
-                //check we have the correct number of intensities passed
-                if(chainData[i].intensities.length !== 3){
-                    allOk = false;
-                    errorMessages.push(`Incorrect number of intensities passed - each stage should have 3 intensities - stage ${i+1} has ${chainData[i].intensities.length} set`);
-                }
+                // //check we have the correct number of intensities passed
+                // if(chainData[i].intensities.length !== 3){
+                //     allOk = false;
+                //     errorMessages.push(`Incorrect number of intensities passed - each stage should have 3 intensities - stage ${i+1} has ${chainData[i].intensities.length} set`);
+                // }
 
 
-                //check the intensities are in range (0-100%)
-                chainData[i].intensities[0] = (Math.round(parseFloat(chainData[i].intensities[0])*10000)/10000);
-                chainData[i].intensities[1] = (Math.round(parseFloat(chainData[i].intensities[1])*10000)/10000);
-                chainData[i].intensities[2] = (Math.round(parseFloat(chainData[i].intensities[2])*10000)/10000);
-                if(chainData[i].intensities[0] < 0 || chainData[i].intensities[0] > 100 ){
-                    allOk = false;
-                    errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[0]} passed`);
-                }
-                if(chainData[i].intensities[1] < 0 || chainData[i].intensities[1] > 100 ){
-                    allOk = false;
-                    errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[1]} passed`);
-                }
-                if(chainData[i].intensities[2] < 0 || chainData[i].intensities[2] > 100 ){
-                    allOk = false;
-                    errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[2]} passed`);
-                }
-                //check the flash positions are within range
-                if(chainData[i].flashPosition > 255 || chainData[i].flashPosition < 0 ){
-                    allOk = false;
-                    errorMessages.push(`Flash position must be between 0 and  255 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].flashPosition} passed`);
-                }
+                // //check the intensities are in range (0-100%)
+                // // noinspection JSCheckFunctionSignatures
+                // chainData[i].intensities[0] = (Math.round(parseFloat(chainData[i].intensities[0])*10000)/10000);
+                // // noinspection JSCheckFunctionSignatures
+                // chainData[i].intensities[1] = (Math.round(parseFloat(chainData[i].intensities[1])*10000)/10000);
+                // // noinspection JSCheckFunctionSignatures
+                // chainData[i].intensities[2] = (Math.round(parseFloat(chainData[i].intensities[2])*10000)/10000);
+                //
+                // if(chainData[i].intensities[0] < 0 || chainData[i].intensities[0] > 100 ){
+                //     allOk = false;
+                //     errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[0]} passed`);
+                // }
+                // if(chainData[i].intensities[1] < 0 || chainData[i].intensities[1] > 100 ){
+                //     allOk = false;
+                //     errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[1]} passed`);
+                // }
+                // if(chainData[i].intensities[2] < 0 || chainData[i].intensities[2] > 100 ){
+                //     allOk = false;
+                //     errorMessages.push(`Flash intensities must between 0 and 100 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].intensities[2]} passed`);
+                // }
+                // //check the flash positions are within range
+                // if(chainData[i].flashPosition > 255 || chainData[i].flashPosition < 0 ){
+                //     allOk = false;
+                //     errorMessages.push(`Flash position must be between 0 and  255 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].flashPosition} passed`);
+                // }
 
                 // check flash duration is a number
-                if(typeof chainData[i].duration !== 'number'){
+                if (typeof chainData[i].duration !== 'number'){
                     allOk = false;
-                    errorMessages.push(`Flash duration must be a number - occurred on stage ${i+1} light node ID # ${chainData[i].id}`);qwe
+                    errorMessages.push(`Flash duration must be a number - occurred on stage ${i + 1} light node ID # ${chainData[i].id}`);
 
                 }
                 //check the flash durations are acceptable
-                if(chainData[i].duration < 0 || chainData[i].duration > 30 ){
+                if (chainData[i].duration < 0 || chainData[i].duration > 30){
                     allOk = false;
-                    errorMessages.push(`Duration error - flash duration must be between 0 and 30 - occurred on stage ${i+1} light node ID ${chainData[i].id} - ${chainData[i].duration} passed`)
+                    errorMessages.push(`Duration error - flash duration must be between 0 and 30 - occurred on stage ${i + 1} light node ID ${chainData[i].id} - ${chainData[i].duration} passed`);
                 }
             }
-            if(allOk){
-                this.socket.emit('api-upload-chain-mode-sequence',chainData,(response) => {
-                    if (response.status) {
+            if (allOk){
+                this.socket.emit('api-configure-chain-mode-sequence', chainData, (response) => {
+                    if (response.status){
+                        console.log("config.resolve()");
                         resolve();
-                    } else {
+                    }
+                    else{
                         reject(response.errors);
                     }
                 });
-            }else{reject(errorMessages);}
-        });
-
-    }
-
-    exitChainMode(){
-        return new Promise((resolve, reject) => {
-            console.log("Exiting chain mode");
-            this.socket.emit("api-exit-chain-mode", (exitStatus)=>{
-                if (exitStatus === true){
-                    resolve();
-                }
-                else{
-                    reject();
-                }
-            })
+            }
+            else{
+                reject(errorMessages);
+            }
         });
     }
 
-    /*
-    *   Allows the programming of custom light stages - intricate control over each lighting stage
-    * */
+    /**
+     *
+     * @param {number[]} brightnesses
+     * @returns {Promise<void>}
+     */
+    armChainMode(brightnesses){
+        return new Promise(((resolve, reject) => {
+            if (Array.isArray(brightnesses)){
+                /** @type {boolean} */ let allNums = true;
+                for (let bval of brightnesses){
+                    if (typeof bval !== "number"){
+                        allNums = false;
+                    }
+                }
+                if (allNums){
+                    this.socket.emit("api-arm-chain-mode-sequence", brightnesses, (response) => {
+                        if (response.status){
+                            resolve();
+                        }
+                        else{
+                            // noinspection JSUnresolvedVariable
+                            reject(response.errors);
+                        }
+                    });
+                }
+            }
+        }
+        ));
+    }
+
+
+    // TJG commented out... no longer needed.
+    // exitChainMode(){
+    //     return new Promise((resolve, reject) => {
+    //         console.log("Exiting chain mode");
+    //         this.socket.emit("api-exit-chain-mode", (exitStatus)=>{
+    //             if (exitStatus === true){
+    //                 resolve();
+    //             }
+    //             else{
+    //                 reject();
+    //             }
+    //         })
+    //     });
+    // }
+
+
+    /**
+     *
+     * @param sequenceData
+     * @returns {Promise<void>}
+     */
     sequence(sequenceData){
         return new Promise((resolve,reject)=>{
             console.log("Uploading Sequence payload");
@@ -339,16 +415,13 @@ module.exports = class {
             }
 
             for(let i=0;i<sequenceData.length;i++){
-
                 if(!Array.isArray(sequenceData[i])){
                     allOk = false;
                     errorMessages.push(`Each stage within the sequence data must be an array - stage ${i+1} was an ${typeof sequenceData[i]}`);
                 }
 
                 let idsUsed = [];
-
                 for(let j=0;j<sequenceData[i].length;j++){
-
                     //check ids are unique
                     if(idsUsed.includes(sequenceData[i][j].id)){
                         allOk = false;
@@ -623,6 +696,7 @@ module.exports = class {
         })
     }
 
+    // noinspection JSUnusedGlobalSymbols
     writeEEPROMAddresses(){
         return new Promise((resolve,reject)=>{
             this.socket.emit('api-write-eeprom-addresses',(response)=>{
@@ -636,6 +710,7 @@ module.exports = class {
         })
     }
 
+    // noinspection JSUnusedGlobalSymbols
     setNodeChain(rigPattern,nodeString,nodeTypeId = 1){
         return new Promise((resolve,reject)=>{
             let rigData = {
@@ -668,129 +743,131 @@ module.exports = class {
         });
     }
 
-    animate(){
-        this.socket.emit("api-animate", (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
+    // TJG commented out - errors driving the IDE mad.
+    // animate(){
+    //     this.socket.emit("api-animate", (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // getShutterLag(){
+    //     this.socket.emit("api-get-shutter-lag", (response)=>{
+    //         if (response.status === true){
+    //             resolve(response.payload);
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // measureCameraPerformance(){
+    //     this.socket.emit("api-measure-camera-performance", (response)=>{
+    //         if (response.status === true){
+    //             resolve(response.payload);
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // loadLightNodeIDs(){
+    //     this.socket.emit("api-load-light-node-ids", (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    //
+    // resetLightNodes(){
+    //     this.socket.emit("api-reset-light-nodes", (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    //
+    // debugDataLine(debugging){
+    //     this.socket.emit("api-debug-data-line", debugging, (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // pingAllNodes(){
+    //     this.socket.emit("api-ping-all-nodes", (response)=>{
+    //         if (response.status === true){
+    //             resolve(respose.payload);
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // checkRigFunctionality(){
+    //     this.socket.emit("api-check-rig-functionality", (response)=>{
+    //         if (response.status === true){
+    //             resolve(response.payload);
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // assertFocus(focusing){
+    //     this.socket.emit("api-assert-focus", focussing, (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // assertTrigger(triggering){
+    //     this.socket.emit("api-assert-trigger", triggering, (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
+    //
+    // assertTriggerAndCount(frames){
+    //     this.socket.emit("api-assert-shutter-and-count", frames, (response)=>{
+    //         if (response.status === true){
+    //             resolve();
+    //         }
+    //         else{
+    //             reject(response.errors);
+    //         }
+    //     })
+    // }
 
-    getShutterLag(){
-        this.socket.emit("api-get-shutter-lag", (response)=>{
-            if (response.status === true){
-                resolve(response.payload);
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    measureCameraPerformance(){
-        this.socket.emit("api-measure-camera-performance", (response)=>{
-            if (response.status === true){
-                resolve(response.payload);
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    loadLightNodeIDs(){
-        this.socket.emit("api-load-light-node-ids", (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-
-    resetLightNodes(){
-        this.socket.emit("api-reset-light-nodes", (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-
-    debugDataLine(debugging){
-        this.socket.emit("api-debug-data-line", debugging, (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    pingAllNodes(){
-        this.socket.emit("api-ping-all-nodes", (response)=>{
-            if (response.status === true){
-                resolve(respose.payload);
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    checkRigFunctionality(){
-        this.socket.emit("api-check-rig-functionality", (response)=>{
-            if (response.status === true){
-                resolve(response.payload);
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    assertFocus(focusing){
-        this.socket.emit("api-assert-focus", focussing, (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    assertTrigger(triggering){
-        this.socket.emit("api-assert-trigger", triggering, (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
-    assertTriggerAndCount(frames){
-        this.socket.emit("api-assert-shutter-and-count", frames, (response)=>{
-            if (response.status === true){
-                resolve();
-            }
-            else{
-                reject(response.errors);
-            }
-        })
-    }
-
+    // noinspection JSUnusedGlobalSymbols
     rewindSequencePoint(){
         return new Promise((resolve,reject)=>{
            this.socket.emit('rewind-sequence-point',(response)=>{
@@ -862,6 +939,7 @@ module.exports = class {
 
     useBackendTerminalCommand(termCommand){
         this.socket.emit("api-terminal", termCommand, (respobject)=>{
+            // noinspection JSUnresolvedVariable
             if (respobject.messageBack === "ACK"){
                 console.log("running command: " + termCommand);
             }
@@ -882,60 +960,72 @@ module.exports = class {
 
 
     describeErrors(errorsInput){
-        console.log(errorsInput);
-        let errors;
-        if (typeof errorsInput === "undefined"){
-            errorsInput = "";
+        //console.log(errorsInput);
+        if (errorsInput === ""){
+
         }
-        if (typeof errorsInput === "string"){
-            errors = [errorsInput];
+        else if (Array.isArray(errorsInput)){
+            console.table(errorsInput);
         }
-        else {
-            errors = errorsInput;
+        else if (typeof errorsInput === "string"){
+            console.log("ERROR" + errorsInput);
         }
 
-        let longestMessage = 52;
-        for(let i=0;i<errors.length;i++){
-            if((errors[i].length+11) > longestMessage){
-                longestMessage = errors[i].length+11;
-            }
-        }
-        let leftSide = 0;
-        let rightSide = 0;
-        if(longestMessage > 41){
-            let numEquals = longestMessage - 41;
-            if(numEquals%2){
-                //odd number
-                leftSide++;
-                numEquals--;
-            }
-            leftSide = leftSide + (numEquals / 2);
-            rightSide = numEquals / 2;
-        }
-        let wideString = '|';
-        let leftString = '|';
-        let rightString = '';
-        for(let i=0;i<longestMessage;i++){
-            wideString = wideString+'=';
-        }
-        for(let i=0;i<leftSide;i++){
-            leftString = leftString+'=';
-        }
-        for(let i=0;i<rightSide;i++){
-            rightString = rightString+'=';
-        }
-
-        console.log();
-        console.log(wideString);
-        console.log(leftString+`|     ERROR - There were ${errors.length} error(s)     |`+rightString);
-        console.log(leftString+"| Summary of the error(s) is as follows |"+rightString);
-        console.log(wideString);
-        console.log("|");
-        for(let i =0; i<errors.length;i++){
-            console.log(`|    #${i+1})    `+errors[i]);
-        }
-        console.log(wideString);
+        // let errors;
+        // if (typeof errorsInput === "undefined"){
+        //
+        //     //errorsInput = ""; // Don't write to function argument.
+        // }
+        // if (typeof errorsInput === "string"){
+        //     errors = [errorsInput];
+        // }
+        // else {
+        //     errors = errorsInput;
+        // }
+        //
+        // let longestMessage = 52;
+        // for(let i=0;i<errors.length;i++){
+        //     if((errors[i].length+11) > longestMessage){
+        //         longestMessage = errors[i].length+11;
+        //     }
+        // }
+        // let leftSide = 0;
+        // let rightSide = 0;
+        // if(longestMessage > 41){
+        //     let numEquals = longestMessage - 41;
+        //     if(numEquals%2){
+        //         //odd number
+        //         leftSide++;
+        //         numEquals--;
+        //     }
+        //     leftSide = leftSide + (numEquals / 2);
+        //     rightSide = numEquals / 2;
+        // }
+        // let wideString = '|';
+        // let leftString = '|';
+        // let rightString = '';
+        // for(let i=0;i<longestMessage;i++){
+        //     wideString = wideString+'=';
+        // }
+        // for(let i=0;i<leftSide;i++){
+        //     leftString = leftString+'=';
+        // }
+        // for(let i=0;i<rightSide;i++){
+        //     rightString = rightString+'=';
+        // }
+        //
+        // console.log();
+        // console.log(wideString);
+        // console.log(leftString+`|     ERROR - There were ${errors.length} error(s)     |`+rightString);
+        // console.log(leftString+"| Summary of the error(s) is as follows |"+rightString);
+        // console.log(wideString);
+        // console.log("|");
+        // for(let i =0; i<errors.length;i++){
+        //     console.log(`|    #${i+1})    `+errors[i]);
+        // }
+        // console.log(wideString);
     }
+
 
 
 
@@ -949,3 +1039,8 @@ module.exports = class {
     }
 
 };
+
+
+process.on('unhandledRejection', error => {
+    console.log('unhandledRejection', error);
+});

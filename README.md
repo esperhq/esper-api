@@ -249,7 +249,7 @@ let chainPayload = [
     }
 ];
 
-Esper.chain(chainPayload)
+Esper.configureChainMode(chainPayload)
     .then(()=>{
         console.log("Chain mode data uploaded to the Light Nodes");
         //ready to trigger    
