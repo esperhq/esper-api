@@ -1,11 +1,11 @@
 let esperClass = require("./esper-api");
-let Esper = new esperClass(true,'http:192.168.1.14'); // enable verbose reporting
+let Esper = new esperClass(true); // enable verbose reporting
 
 
 Esper.connect()
     .then(()=>{
         //modelling light off
-        return Esper.globalModellingLight([0, 0, 0.]);
+        return Esper.globalModellingLight([0, 0, 0]);
     })
 
 

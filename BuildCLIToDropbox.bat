@@ -1,1 +1,0 @@
-pkg cli.js --out-path "D:\Dropbox (Esper)\ESPER (Shared Resources)\AVATTA_SHARED\ESPER_CLI.exe" -d -t node12-win-x64
