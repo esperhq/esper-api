@@ -9,7 +9,6 @@ initUserInput();
  */
 let userFlashDuration = 20;
 
-
 // set to something low while doing inital tests. Increase only when everything has been verified.
 /** @type {number[]} */
 let userFlashBrightnesses = [
@@ -18,6 +17,7 @@ let userFlashBrightnesses = [
     5
 ];
 
+let directionVector = [0, 0, -1];  //+Z
 
 esper.connect()
     .then(() => {
@@ -27,7 +27,7 @@ esper.connect()
         // This is an edge case however given that we want to look at a vector with a bunch of zeros in - gone down the dot product route for completeness
 
         // noinspection DuplicatedCode
-        let directionVector = [0, 0, -1];  //+Z
+
 
         //get around pass-by-reference
         let lights = JSON.parse(JSON.stringify(esper.availableLights));
