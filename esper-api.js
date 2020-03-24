@@ -947,8 +947,9 @@ module.exports = class {
 
 
     describeErrors(errorsInput){
-        //console.log(errorsInput);
+
         if (errorsInput === ""){
+
 
         }
         else if (Array.isArray(errorsInput)){
