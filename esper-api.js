@@ -1,6 +1,5 @@
 const io = require('socket.io-client');
-
-let apiVersionCompatibility = "0.7.15";
+const VERSION_COMPATIBILITY = "0.7.17"
 
 module.exports = class {
     socket;
@@ -23,6 +22,7 @@ module.exports = class {
             if(this.verbose){console.log("Connecting to Esper API at "+this.endpoint);}
             this.socket.on('connect',()=>{
                 if(this.verbose){console.log("Connected to Esper API");}
+                if(this.verbose){console.log("API wrapper version: " + VERSION_COMPATIBILITY);}
                 this.connected = true;
                 this.getAvailableLights()
                 // .then((theLights)=>{ // TJG Commented out as available lights already set in above function
@@ -31,9 +31,10 @@ module.exports = class {
                 .then(()=>{
                     return this.getControlSuiteVersion();
                 }).then((versionString)=>{
-                    if (versionString !== apiVersionCompatibility){
+                    versionString = versionString.replace("v", "");
+                    if (versionString !== VERSION_COMPATIBILITY){
                         console.warn("WARN: api version and ControlSuite version mistmatch");
-                        console.warn("Please update api to latest version");
+                        console.warn("Please update api/control suites to equal versions");
                     }
                 }).then(()=>{
                     resolve();
@@ -239,7 +240,7 @@ module.exports = class {
         return new Promise((resolve, reject)=>{
            this.socket.emit("api-get-version-number", (response)=>{
                if (typeof response === "string"){
-                   console.log(response);
+                   console.log("Control Suite Version: " + response);
                    resolve(response);
                }
                else {
@@ -333,10 +334,11 @@ module.exports = class {
             if (allOk){
                 this.socket.emit('api-configure-chain-mode-sequence', chainData, (response) => {
                     if (response.status){
-                        console.log("config.resolve()");
+                        console.log("ControlSuite configured chain mode....");
                         resolve();
                     }
                     else{
+                        console.log("ControlSuite responded with errors:");
                         reject(response.errors);
                     }
                 });
