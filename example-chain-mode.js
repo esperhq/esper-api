@@ -9,15 +9,13 @@ initUserInput();
  */
 let userFlashDuration = 20;
 
-
-// set to something low while doing inital tests. Increase only when everything has been verified.
+// set to something low while doing initial tests. Increase only when everything has been verified.
 /** @type {number[]} */
 let userFlashBrightnesses = [
     5,
     5,
     5
 ];
-
 
 esper.connect()
     .then(() => {
@@ -67,7 +65,7 @@ esper.connect()
             console.log("armed... ready for trigger.");
             promptUser("Press f to test a single flash..." +
                 "\n\t k to reset the lights to sequence point zero..." +
-                "\n\t x to exit ..."
+                "\n\t x to exit ... \n"
             );
         })
         .catch((err)=>{
@@ -103,11 +101,15 @@ process.stdin.on("keypress", (err, key) => {
             break;
 
         case "x":
-            esper.disconnect();
-            process.exit(0);
+            quit();
             break;
     }
 });
+
+function quit(){
+    esper.disconnect();
+    process.exit(0);
+}
 
 function initUserInput(){
     try{
