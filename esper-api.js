@@ -337,6 +337,7 @@ module.exports = class {
                         resolve();
                     }
                     else{
+                        console.log("ControlSuite responded with errors:");
                         reject(response.errors);
                     }
                 });
