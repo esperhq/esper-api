@@ -1,5 +1,5 @@
 const io = require('socket.io-client');
-const VERSION_COMPATIBILITY = require('../backend/package.json').version;
+const VERSION_COMPATIBILITY = "0.7.17"
 
 
 module.exports = class {
