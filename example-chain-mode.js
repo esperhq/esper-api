@@ -7,14 +7,14 @@ initUserInput();
  * Duration in milliseconds to flash one at a time.
  * @type {number}
  */
-let userFlashDuration = 20;
+let userFlashDuration = 5;  // min: 1, max: 30;
 
 // set to something low while doing initial tests. Increase only when everything has been verified.
 /** @type {number[]} */
 let userFlashBrightnesses = [
-    5,
-    5,
-    5
+   3, // (%)
+   3, // (%)
+   3  // (%)
 ];
 
 let directionVector = [0, 0, -1];  //+Z
