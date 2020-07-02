@@ -1,5 +1,5 @@
 const io = require('socket.io-client');
-const VERSION_COMPATIBILITY = "0.7.17"
+const VERSION_COMPATIBILITY = "0.7.18"
 
 module.exports = class {
     socket;
