@@ -3,7 +3,8 @@ let esperApi = new EsperApi();
 
 initUserInput();
 
-let userFlashDurationMillis = 1;
+const userFlashDurationMillis = 1;
+const saturateToExtrema = true;
 
 // define the lighting directions  (change to match your direction convention if needed..)
 const DIR_VECT_GLOBAL    = [ 0, 0, 0];
@@ -45,7 +46,7 @@ let directionsToUse = [
 ];
 
 // specify which leds to use in sequence order:
-let ledsToUse = [
+const ledsToUse = [
     NEUTRAL_LED,
     CROSS_LED,
     PARALLEL_LED,
@@ -66,7 +67,7 @@ let ledsToUse = [
     PARALLEL_LED,
 ];
 
-let perStageIntensityMask = [
+const perStageIntensityMask = [
     0.4,
     1,
     0.7,
@@ -87,7 +88,7 @@ let perStageIntensityMask = [
     0.7
 ];
 
-if (ledsToUse.length === directionsToUse.length){
+if (ledsToUse.length === directionsToUse.length && ledsToUse.length === perStageIntensityMask.length){
     esperApi.connect()
         .then(() => {
             let lights = JSON.parse(JSON.stringify(esperApi.availableLights)); // lazy deep copy.
@@ -96,14 +97,17 @@ if (ledsToUse.length === directionsToUse.length){
                 light.ledsTable = [];
                 for (let sIt = 0; sIt < directionsToUse.length; sIt++){
                     let directionVector = directionsToUse[sIt];
-                    let calculatedIntensity = -1;
+                    let calculatedIntensity_Unitary = -1;
                     if (calcMagnitude(directionVector) > 0.001){ // if vector is [0,0,0], light from everywhere.
-                        calculatedIntensity = calcUnitaryInteractionWith(light.positions, directionVector);
+                        calculatedIntensity_Unitary = calcUnitaryInteractionWith(light.positions, directionVector);
+                        if (saturateToExtrema === true){
+                            calculatedIntensity_Unitary = (calculatedIntensity_Unitary > 0.95) ? 1 : 0;
+                        }
                     }
                     else{
-                        calculatedIntensity = 1; // GI
+                        calculatedIntensity_Unitary = 1; // GI
                     }
-                    light.intensitiesTable.push(calculatedIntensity * 100 * perStageIntensityMask[sIt]);
+                    light.intensitiesTable.push(calculatedIntensity_Unitary * 100 * perStageIntensityMask[sIt]);
                     light.ledsTable.push(ledsToUse[sIt]);
                 }
             }

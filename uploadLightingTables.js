@@ -3,12 +3,16 @@ let Esper = new esperClass(true); // enable verbose reporting
 
 Esper.connect()
     .then(() => {
+
         let stage = [];
-        let duration = 0.02;
+
+        let duration = 2;
         for (let i = 0; i < Esper.availableLights.length; i++){
-            stage.push({id: Esper.availableLights[i].id, intensities: [100, 0, 100], duration: duration});
+            stage.push({id: Esper.availableLights[i].id, intensities: [2, 2, 2], duration: duration});
         }
+
         let payload = [];
+
         for (let j = 0; j < 32; j++){
             payload.push(stage);
         }
