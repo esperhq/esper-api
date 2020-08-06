@@ -180,7 +180,7 @@ esper.connect()
                 /** @type {ChainModeDataInstance} */
                 let dataInstance = {
                     id: light.id,
-                    flashPosition: stageAssignment*2,
+                    flashPosition: stageAssignment,
                     duration: userFlashDuration,
                     locationInSpace: positions
                 };
