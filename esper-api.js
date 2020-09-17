@@ -51,6 +51,13 @@ module.exports = class {
                 if(this.verbose){console.log("Disconnected from Esper API");}
                 this.connected = false;
             });
+
+            this.socket.on('userMessage',(payload,callback)=>{
+                if(this.verbose){
+                    console.log(payload.message);
+                }
+                callback(payload.id);
+            })
         });
     }
 
@@ -999,6 +1006,10 @@ module.exports = class {
             this.server = require('socket.io').listen(this.port);
             this.server.on('connection',(socket)=>{
                 if(this.verbose){console.log("server detected a client connection");}
+
+                socket.on("api-get-version-number",(callback)=>{
+                    callback(VERSION_COMPATIBILITY);
+                });
                 socket.on('api-set-global-modelling-light',(modellingLight,callback)=>{
                     callback({status:true});
                 });
