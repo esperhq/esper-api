@@ -1,5 +1,5 @@
 const io = require('socket.io-client');
-const VERSION_COMPATIBILITY = "0.7.18"
+const VERSION_COMPATIBILITY = "0.7.22"
 
 module.exports = class {
     socket;
@@ -33,7 +33,7 @@ module.exports = class {
                 }).then((versionString)=>{
                     versionString = versionString.replace("v", "");
                     if (versionString !== VERSION_COMPATIBILITY){
-                        console.warn("WARN: api version and ControlSuite version mistmatch");
+                        console.warn("WARN: api version and ControlSuite version mismatch");
                         console.warn("Please update api/control suites to equal versions");
                     }
                 }).then(()=>{
@@ -386,22 +386,49 @@ module.exports = class {
         ));
     }
 
+    setLoopToStage(loopTo) {
+        return new Promise((resolve, reject) => {
+            console.log("Setting loopTo stage: " + loopTo);
+            if (typeof loopTo === "number") {
+                this.socket.emit("api-set-loop-to-stage", loopTo, (response)=>{
+                    if (response.status){
+                        if (response.status === true){
+                            console.log("LoopTo stage set...");
+                            resolve();
+                        }
+                    }
+                    else{
+                        reject("No response object");
+                    }
+                });
+            }
+            else {
+                reject(["payload.loopToStage must be an integer in the range 0-31"]);
+            }
+        });
+    }
 
-    // TJG commented out... no longer needed.
-    // exitChainMode(){
-    //     return new Promise((resolve, reject) => {
-    //         console.log("Exiting chain mode");
-    //         this.socket.emit("api-exit-chain-mode", (exitStatus)=>{
-    //             if (exitStatus === true){
-    //                 resolve();
-    //             }
-    //             else{
-    //                 reject();
-    //             }
-    //         })
-    //     });
-    // }
-
+    setLoopAtStage(loopAt) {
+        return new Promise((resolve, reject) => {
+            console.log("Setting loopAt stage: " + loopAt);
+            if (typeof loopAt === "number") {
+                this.socket.emit("api-set-loop-at-stage", loopAt, (response)=>{
+                    if (response.status){
+                        if (response.status === true){
+                            console.log("LoopAt stage set...");
+                            resolve();
+                        }
+                    }
+                    else{
+                        reject("No response object");
+                    }
+                });
+            }
+            else {
+                reject(["payload.loopAtStage must be an integer in the range 0-31"]);
+            }
+        });
+    }
 
     /**
      *
