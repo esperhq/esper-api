@@ -1,5 +1,5 @@
 const io = require('socket.io-client');
-const VERSION_COMPATIBILITY = "0.7.22"
+const VERSION_COMPATIBILITY = "0.7.23"
 
 module.exports = class {
     socket;
@@ -257,6 +257,28 @@ module.exports = class {
         });
     }
 
+    setLightingMode(mode){
+        return new Promise((resolve, reject)=>{
+            console.log("Setting lighting mode to: " + mode);
+            if (mode === "table" || mode === "chain"){
+                this.socket.emit("api-set-lighting-mode", mode, (response)=>{
+                   if (response.status === true){
+                       console.log("New lighting mode set: " + mode);
+                       resolve();
+                   }
+                   else if (response.progress !== undefined){
+                       console.log("progress: " + response.progress + "%");
+                   }
+                   else if (response.status === false){
+                       reject("ControlSuite did not confirm mode change");
+                   }
+                });
+            }
+            else{
+                reject("Lighting mode arg must be one of \"table\" or \"chain\"");
+            }
+        });
+    }
 
 
     /**
