@@ -412,19 +412,22 @@ module.exports = class {
         return new Promise((resolve, reject) => {
             console.log("Setting loopTo stage: " + loopTo);
             if (typeof loopTo === "number") {
-                this.socket.emit("api-set-loop-to-stage", loopTo, (response)=>{
-                    if (response.status){
-                        if (response.status === true){
+                this.socket.emit("api-set-loop-to-stage", loopTo, (response) => {
+                    if (response.status) {
+                        if (response.status === true) {
                             console.log("LoopTo stage set...");
-                            resolve();
+                            this.socket.emit("api-set-current-sequence-position", loopTo, (response) => {
+                                    if (response.status === true) {
+                                        resolve();
+                                    }
+                                }
+                            );
                         }
-                    }
-                    else{
+                    } else {
                         reject("No response object");
                     }
                 });
-            }
-            else {
+            } else {
                 reject(["payload.loopToStage must be an integer in the range 0-31"]);
             }
         });
