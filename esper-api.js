@@ -1,5 +1,5 @@
 const io = require('socket.io-client');
-const VERSION_COMPATIBILITY = "0.7.23"
+const VERSION_COMPATIBILITY = "0.8.6"
 
 module.exports = class {
     socket;
@@ -412,7 +412,7 @@ module.exports = class {
         return new Promise((resolve, reject) => {
             console.log("Setting loopTo stage: " + loopTo);
             if (typeof loopTo === "number") {
-                this.socket.emit("api-set-loop-to-stage", loopTo, (response) => {
+                this.socket.emit("api-set-loop-to-stage", loopTo, (response) =>{
                     if (response.status) {
                         if (response.status === true) {
                             console.log("LoopTo stage set...");
