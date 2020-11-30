@@ -1,5 +1,5 @@
 const io = require('socket.io-client');
-const VERSION_COMPATIBILITY = "0.8.6"
+const VERSION_COMPATIBILITY = "0.9.2"
 
 module.exports = class {
     socket;
@@ -102,6 +102,7 @@ module.exports = class {
     globalModellingLight(payload){
         return new Promise((resolve,reject)=> {
             if (this.connected) {
+                console.log("Setting global modelling light...");
                 let allOk = true;
                 let desiredGlobalModellingLight = [];
                 let errorMessages = [];
